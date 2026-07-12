@@ -20,14 +20,21 @@ export async function suscribirPush(token) {
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
 
-    // Reusar suscripción existente o crear nueva
+    // Forzar nueva suscripción en cada login para que siempre use la clave VAPID actual
     let sub = await reg.pushManager.getSubscription();
-    if (!sub) {
-      sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicKey),
-      });
+    if (sub) {
+      try {
+        await sub.unsubscribe();
+      } catch (e) {
+        console.warn('No se pudo cancelar la suscripción anterior:', e);
+      }
+      sub = null;
     }
+
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
 
     // Siempre reenviar al backend — cada dispositivo/sesión necesita registrarse
     await fetch(`${BASE_URL}/push/subscribe`, {
