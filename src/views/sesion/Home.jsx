@@ -22,34 +22,24 @@ function calcularRestante(fecha, horaInicio) {
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   const s = Math.floor((diff % 60000) / 1000);
-  if (h >= 24) {
-    const dias = Math.floor(h / 24);
-    return `${dias}d ${h % 24}h ${m}m`;
-  }
+  if (h >= 24) return `${Math.floor(h / 24)}d ${h % 24}h ${m}m`;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+// Recibe ocupados/capacidad como props — actualizados por el polling del padre
 function TarjetaSesion({ sesion }) {
   const [countdown, setCountdown] = useState(() => calcularRestante(sesion.fecha, sesion.hora_inicio));
-  const [asistentes, setAsistentes] = useState(null);
   const notif5Ref = useRef(false);
-
-  useEffect(() => {
-    api.sesiones.asistentes(sesion.id)
-      .then(setAsistentes)
-      .catch(() => {});
-  }, [sesion.id]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       const inicio = new Date(`${sesion.fecha}T${sesion.hora_inicio}`);
       const diff = inicio - Date.now();
 
-      // Notificación 5 minutos antes (ventana entre 5:00 y 4:59)
-      if (diff > 0 && diff <= 300000 && diff > 240000 && !notif5Ref.current) {
+      if (diff > 240000 && diff <= 300000 && !notif5Ref.current) {
         if (Notification.permission === 'granted') {
           new Notification(`⏰ Empieza en 5 min — ${sesion.titulo}`, {
-            body: `El evento inicia a las ${sesion.hora_inicio} en ${sesion.sala || 'su sala'}.`,
+            body: `Inicia a las ${sesion.hora_inicio} en ${sesion.sala || 'su sala'}.`,
             icon: '/favicon.ico',
           });
         }
@@ -61,8 +51,8 @@ function TarjetaSesion({ sesion }) {
     return () => clearInterval(timer);
   }, [sesion.fecha, sesion.hora_inicio, sesion.titulo, sesion.sala]);
 
-  const ocupados = asistentes?.ocupados ?? sesion.ocupados ?? 0;
-  const capacidad = asistentes?.capacidad ?? sesion.capacidad;
+  const ocupados = sesion.ocupados ?? 0;
+  const capacidad = sesion.capacidad;
   const porcentaje = capacidad ? Math.round((ocupados / capacidad) * 100) : 0;
   const barColor = porcentaje >= 90 ? '#dc3545' : porcentaje >= 60 ? '#fd7e14' : '#28a745';
 
@@ -124,19 +114,32 @@ export default function Home() {
   useNotificaciones(registrados, setRegistrados);
 
   useEffect(() => {
-    api.sesiones.misRegistros()
-      .then(setRegistrados)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    const cargar = async () => {
+      try {
+        const data = await api.sesiones.misRegistros();
+        const enriquecidos = await Promise.all(
+          data.map(async s => {
+            try {
+              const info = await api.sesiones.asistentes(s.id);
+              return { ...s, ocupados: info.ocupados, capacidad: info.capacidad ?? s.capacidad };
+            } catch { return s; }
+          })
+        );
+        setRegistrados(enriquecidos);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    cargar();
   }, []);
 
   return (
     <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ margin: 0, color: '#333' }}>Mis Eventos</h1>
-        <p style={{ margin: '4px 0 0', color: '#666' }}>
-          Bienvenido, <strong>{user?.username}</strong>
-        </p>
+        <p style={{ margin: '4px 0 0', color: '#666' }}>Bienvenido, <strong>{user?.username}</strong></p>
       </div>
 
       {loading && <div style={{ textAlign: 'center', padding: '40px' }}>Cargando...</div>}

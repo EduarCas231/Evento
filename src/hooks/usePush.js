@@ -20,15 +20,16 @@ export async function suscribirPush(token) {
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
 
-    // Si ya hay suscripción activa no volver a suscribir
-    const existing = await reg.pushManager.getSubscription();
-    if (existing) return;
+    // Reusar suscripción existente o crear nueva
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      });
+    }
 
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
-    });
-
+    // Siempre reenviar al backend — cada dispositivo/sesión necesita registrarse
     await fetch(`${BASE_URL}/push/subscribe`, {
       method: 'POST',
       headers: {
