@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotificaciones } from '../../hooks/useNotificaciones';
+import { useSSE } from '../../hooks/useSSE';
 
 const etiquetaTipo = (tipo) => (
   <span style={{
@@ -111,8 +112,8 @@ export default function Home() {
   const [error, setError] = useState('');
   const { user } = useAuth();
 
-  useNotificaciones(registrados, setRegistrados);
-
+  useNotificaciones(registrados);
+  useSSE(setRegistrados);
   useEffect(() => {
     const cargar = async () => {
       try {

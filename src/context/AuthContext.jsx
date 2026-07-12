@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { api } from '../services/api';
 
 const AuthContext = createContext(null);
@@ -8,7 +8,13 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
-  const verificarSesion = async () => {
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  const verificarSesion = useCallback(async () => {
     if (!localStorage.getItem('token')) {
       setLoading(false);
       return;
@@ -21,30 +27,24 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [logout]);
 
   // Verificar al cargar la app
   useEffect(() => {
     verificarSesion();
-  }, []);
+  }, [verificarSesion]);
 
   // Reverificar cada 10 minutos para detectar expiración del JWT
   useEffect(() => {
     if (!token) return;
     const intervalo = setInterval(verificarSesion, 10 * 60 * 1000);
     return () => clearInterval(intervalo);
-  }, [token]);
+  }, [token, verificarSesion]);
 
   const login = (userData, userToken) => {
     localStorage.setItem('token', userToken);
     setToken(userToken);
     setUser(userData);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
   };
 
   return (
