@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
-import { suscribirPush } from '../../hooks/usePush';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -27,7 +26,6 @@ export default function Login() {
     try {
       const data = await api.auth.login(email, password);
       login(data.user, data.token);
-      await suscribirPush(data.token);
       navigate('/home');
 
     } catch (err) {

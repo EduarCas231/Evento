@@ -14,13 +14,24 @@ export async function suscribirPush(token) {
   }
 
   try {
+    if (Notification.permission === 'default') {
+      const permiso = await Notification.requestPermission();
+      if (permiso !== 'granted') {
+        console.warn('Permiso de notificaciones denegado o no concedido');
+        return;
+      }
+    } else if (Notification.permission === 'denied') {
+      console.warn('Notificaciones bloqueadas en el navegador');
+      return;
+    }
+
     const res = await fetch(`${BASE_URL}/push/public-key`);
+    if (!res.ok) throw new Error('No fue posible obtener la clave pública VAPID');
     const { publicKey } = await res.json();
 
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
 
-    // Forzar nueva suscripción en cada login para que siempre use la clave VAPID actual
     let sub = await reg.pushManager.getSubscription();
     if (sub) {
       try {
@@ -36,7 +47,6 @@ export async function suscribirPush(token) {
       applicationServerKey: urlBase64ToUint8Array(publicKey),
     });
 
-    // Siempre reenviar al backend — cada dispositivo/sesión necesita registrarse
     await fetch(`${BASE_URL}/push/subscribe`, {
       method: 'POST',
       headers: {

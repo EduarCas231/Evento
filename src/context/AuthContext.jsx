@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react';
 import { api } from '../services/api';
+import { suscribirPush } from '../hooks/usePush';
 
 const AuthContext = createContext(null);
 
@@ -7,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
+  const pushSubscribed = useRef(false);
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
@@ -46,6 +48,16 @@ export const AuthProvider = ({ children }) => {
     setToken(userToken);
     setUser(userData);
   };
+
+  useEffect(() => {
+    if (!token || !user || pushSubscribed.current) return;
+
+    suscribirPush(token)
+      .catch((e) => console.error('Error de suscripción push en AuthContext:', e))
+      .finally(() => {
+        pushSubscribed.current = true;
+      });
+  }, [token, user]);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, loading }}>
