@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useSSE } from '../../hooks/useSSE';
 import '../../styles/SesionList.css';
 
 const etiquetaTipo = (tipo) => (
@@ -43,16 +44,9 @@ function BarraAsistencia({ asistentes, capacidad }) {
 }
 
 function TarjetaDetalle({ sesion, onEditar, onEliminar, index }) {
-  const [asistentes, setAsistentes] = useState(null);
-  const [loadingA, setLoadingA] = useState(true);
+  const asistentes = sesion.ocupados ?? null;
+  const loadingA = asistentes === null;
   const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    api.sesiones.asistentes(sesion.id)
-      .then((data) => setAsistentes(data.ocupados ?? 0))
-      .catch(() => setAsistentes(0))
-      .finally(() => setLoadingA(false));
-  }, [sesion.id]);
 
   return (
     <div
@@ -129,11 +123,23 @@ export default function SesionList() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  useSSE(setSesiones);
+
   useEffect(() => {
     api.sesiones.listar()
       .then((data) => {
         const propios = data.filter((s) => s.organizador === user?.username);
         setSesiones(propios);
+
+        propios.forEach((s) => {
+          api.sesiones.asistentes(s.id)
+            .then((d) => {
+              setSesiones((prev) =>
+                prev.map((x) => x.id === s.id ? { ...x, ocupados: d.ocupados ?? 0 } : x)
+              );
+            })
+            .catch(() => {});
+        });
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
