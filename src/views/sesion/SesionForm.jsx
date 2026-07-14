@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../services/api';
+import '../../styles/SesionForm.css';
 
-const EMPTY = { titulo: '', sala: '', code: '', capacidad: '', detalles: '', fecha: '', hora_inicio: '', hora_fin: '', zona: '', tipo: 'publico', password: '' };
+const EMPTY = { 
+  titulo: '', 
+  sala: '', 
+  code: '', 
+  capacidad: '', 
+  detalles: '', 
+  fecha: '', 
+  hora_inicio: '', 
+  hora_fin: '', 
+  zona: '', 
+  tipo: 'publico', 
+  password: '' 
+};
 
 export default function SesionForm() {
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const { id } = useParams();
   const navigate = useNavigate();
   const esEdicion = Boolean(id);
@@ -36,14 +50,19 @@ export default function SesionForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
     try {
       if (esEdicion) {
         await api.sesiones.editar(id, form);
+        setSuccess('¡Sesión actualizada con éxito!');
       } else {
         await api.sesiones.crear(form);
+        setSuccess('¡Sesión creada con éxito!');
       }
-      navigate('/sesiones');
+      setTimeout(() => {
+        navigate('/sesiones');
+      }, 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,94 +71,164 @@ export default function SesionForm() {
   };
 
   const campo = (label, name, type = 'text', placeholder = '') => (
-    <div style={{ marginBottom: '15px' }}>
-      <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>{label}</label>
+    <div className="formInputGroup">
+      <label className="formLabel">{label}</label>
       <input
         type={type}
         name={name}
         value={form[name]}
         onChange={handleChange}
         placeholder={placeholder}
-        style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+        className="formInput"
+        disabled={loading}
       />
     </div>
   );
 
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto', padding: '30px', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
-      <h2 style={{ marginBottom: '24px' }}>{esEdicion ? 'Editar Sesión' : 'Nueva Sesión'}</h2>
-
-      {error && <div style={{ padding: '12px', backgroundColor: '#ffe6e6', color: 'red', borderRadius: '4px', marginBottom: '16px' }}>{error}</div>}
-
-      <form onSubmit={handleSubmit}>
-        {campo('Título *', 'titulo', 'text', 'Ej. Conferencia inaugural')}
-        {campo('Código', 'code', 'text', 'Ej. CONF-01')}
-        {campo('Sala', 'sala', 'text', 'Ej. Auditorio A')}
-        {campo('Zona Wearable', 'zona', 'text', 'Ej. Zona Norte')}
-        {campo('Capacidad', 'capacidad', 'number', 'Ej. 200')}
-        {campo('Fecha', 'fecha', 'date')}
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          {campo('Hora inicio', 'hora_inicio', 'time')}
-          {campo('Hora fin', 'hora_fin', 'time')}
+    <div className="formContainer">
+      <div className="formCard">
+        <div className="formHeader">
+          <div className="formLogoContainer">
+            <svg className="formLogo" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {esEdicion ? (
+                <>
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </>
+              ) : (
+                <>
+                  <path d="M12 5v14" />
+                  <path d="M5 12h14" />
+                </>
+              )}
+            </svg>
+          </div>
+          <h1 className="formTitle">
+            {esEdicion ? 'Editar Sesión' : 'Nueva Sesión'}
+          </h1>
+          <p className="formSubtitle">
+            {esEdicion 
+              ? 'Actualiza la información de la sesión' 
+              : 'Completa los datos para crear una nueva sesión'}
+          </p>
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Visibilidad</label>
-          <select
-            name="tipo"
-            value={form.tipo}
-            onChange={handleChange}
-            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
-          >
-            <option value="publico">🌐 Público</option>
-            <option value="privado">🔒 Privado</option>
-          </select>
-        </div>
-
-        {form.tipo === 'privado' && (
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Contraseña del evento</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Contraseña para acceder al evento privado"
-              style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
-            />
+        {error && (
+          <div className="formError">
+            <svg className="formErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span className="formErrorText">{error}</span>
           </div>
         )}
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Detalles</label>
-          <textarea
-            name="detalles"
-            value={form.detalles}
-            onChange={handleChange}
-            rows={3}
-            placeholder="Descripción de la sesión..."
-            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box', resize: 'vertical' }}
-          />
-        </div>
+        {success && (
+          <div className="formSuccess">
+            <svg className="formSuccessIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span className="formSuccessText">{success}</span>
+          </div>
+        )}
 
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ flex: 1, padding: '12px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            {loading ? 'Guardando...' : esEdicion ? 'Actualizar' : 'Crear Sesión'}
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate('/sesiones')}
-            style={{ flex: 1, padding: '12px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
+        <form onSubmit={handleSubmit} className="form">
+          <div className="formGrid">
+            {campo('Título *', 'titulo', 'text', 'Ej. Conferencia inaugural')}
+            {campo('Código', 'code', 'text', 'Ej. CONF-01')}
+            {campo('Sala', 'sala', 'text', 'Ej. Auditorio A')}
+            {campo('Zona Wearable', 'zona', 'text', 'Ej. Zona Norte')}
+            {campo('Capacidad', 'capacidad', 'number', 'Ej. 200')}
+            {campo('Fecha', 'fecha', 'date')}
+          </div>
+
+          <div className="formTimeGrid">
+            {campo('Hora inicio', 'hora_inicio', 'time')}
+            {campo('Hora fin', 'hora_fin', 'time')}
+          </div>
+
+          <div className="formInputGroup">
+            <label className="formLabel">Visibilidad</label>
+            <div className="formSelectWrapper">
+              <select
+                name="tipo"
+                value={form.tipo}
+                onChange={handleChange}
+                className="formSelect"
+                disabled={loading}
+              >
+                <option value="publico">🌐 Público</option>
+                <option value="privado">🔒 Privado</option>
+              </select>
+              <svg className="formSelectIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          </div>
+
+          {form.tipo === 'privado' && (
+            <div className="formInputGroup formPasswordGroup">
+              <label className="formLabel">Contraseña del evento *</label>
+              <div className="formInputWrapper">
+                <svg className="formInputIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+                <input
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Contraseña para acceder al evento privado"
+                  className="formInput formInputWithIcon"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="formInputGroup">
+            <label className="formLabel">Detalles</label>
+            <textarea
+              name="detalles"
+              value={form.detalles}
+              onChange={handleChange}
+              rows={4}
+              placeholder="Descripción de la sesión..."
+              className="formTextarea"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="formButtonGroup">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`formSubmitButton ${loading ? 'formButtonDisabled' : ''}`}
+            >
+              {loading ? (
+                <span className="formLoadingSpinner">
+                  <span className="formSpinner"></span>
+                  Guardando...
+                </span>
+              ) : (
+                esEdicion ? 'Actualizar Sesión' : 'Crear Sesión'
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/sesiones')}
+              className="formCancelButton"
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,431 @@
+/* SesionForm Styles */
+.formContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 20px;
+}
+
+.formCard {
+  background-color: white;
+  border-radius: 24px;
+  padding: 45px;
+  max-width: 640px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(64, 110, 155, 0.15), 0 10px 30px rgba(0, 0, 0, 0.06);
+  animation: slideUp 0.6s ease;
+}
+
+.formHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.formLogoContainer {
+  display: inline-flex;
+  padding: 14px;
+  background: linear-gradient(135deg, #406e9b 0%, #355a7a 100%);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 15px rgba(64, 110, 155, 0.3);
+}
+
+.formLogo {
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.formTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.formSubtitle {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+}
+
+.formError {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  animation: shake 0.5s ease;
+}
+
+.formErrorIcon {
+  width: 20px;
+  height: 20px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.formErrorText {
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.formSuccess {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.formSuccessIcon {
+  width: 20px;
+  height: 20px;
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.formSuccessText {
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formTimeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.3px;
+}
+
+.formInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.formInputIcon {
+  position: absolute;
+  left: 14px;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.formInput {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  font-size: 14px;
+  color: #1a1a2e;
+  background-color: #f9fafb;
+  transition: all 0.3s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.formInputWithIcon {
+  padding-left: 44px;
+}
+
+.formInput:focus {
+  border-color: #406e9b;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(64, 110, 155, 0.15);
+}
+
+.formInput:hover {
+  border-color: #9ca3af;
+}
+
+.formInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formSelectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.formSelect {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  font-size: 14px;
+  color: #1a1a2e;
+  background-color: #f9fafb;
+  transition: all 0.3s ease;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.formSelect:focus {
+  border-color: #406e9b;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(64, 110, 155, 0.15);
+}
+
+.formSelect:hover {
+  border-color: #9ca3af;
+}
+
+.formSelect:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formSelectIcon {
+  position: absolute;
+  right: 14px;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.formPasswordGroup {
+  animation: fadeIn 0.3s ease;
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  font-size: 14px;
+  color: #1a1a2e;
+  background-color: #f9fafb;
+  transition: all 0.3s ease;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.formTextarea:focus {
+  border-color: #406e9b;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(64, 110, 155, 0.15);
+}
+
+.formTextarea:hover {
+  border-color: #9ca3af;
+}
+
+.formTextarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formButtonGroup {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.formSubmitButton {
+  flex: 2;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #406e9b 0%, #355a7a 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(64, 110, 155, 0.3);
+}
+
+.formSubmitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(64, 110, 155, 0.4);
+}
+
+.formSubmitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.formCancelButton {
+  flex: 1;
+  padding: 14px 20px;
+  background-color: #e5e7eb;
+  color: #374151;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.formCancelButton:hover:not(:disabled) {
+  background-color: #d1d5db;
+  transform: translateY(-2px);
+}
+
+.formCancelButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.formCancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formButtonDisabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #b0b8c4 100%);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.formButtonDisabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.formLoadingSpinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.formSpinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .formCard {
+    padding: 30px 20px;
+  }
+
+  .formTitle {
+    font-size: 22px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formTimeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formInput {
+    font-size: 16px;
+  }
+
+  .formSelect {
+    font-size: 16px;
+  }
+
+  .formTextarea {
+    font-size: 16px;
+  }
+
+  .formSubmitButton {
+    padding: 16px;
+    font-size: 15px;
+  }
+
+  .formCancelButton {
+    padding: 16px;
+    font-size: 15px;
+  }
+
+  .formButtonGroup {
+    flex-direction: column;
+  }
+}

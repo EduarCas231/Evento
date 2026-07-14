@@ -1,37 +1,118 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../styles/navbar.css';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const linkStyle = (path) => ({
-    padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', border: 'none',
-    backgroundColor: pathname === path ? '#0056b3' : 'transparent',
-    color: 'white',
-    fontWeight: pathname === path ? 'bold' : 'normal',
-    fontSize: '14px',
-  });
+  const isActive = (path) => pathname === path;
+  const linkClass = (path) => `navLink${isActive(path) ? ' navLinkActive' : ''}`;
 
   return (
-    <nav style={{ backgroundColor: '#007bff', padding: '12px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button style={linkStyle('/home')} onClick={() => navigate('/home')}>Inicio</button>
-        <button style={linkStyle('/eventos')} onClick={() => navigate('/eventos')}>Eventos</button>
-        {user?.role === 'admin' && (
-          <button style={linkStyle('/sesiones')} onClick={() => navigate('/sesiones')}>Datos de Sesiones</button>
-        )}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        
+    <nav className="navbar">
+      <div className="navbarContainer">
+        {/* Logo y marca */}
+        <div className="brand" onClick={() => navigate('/home')}>
+          <div className="logoContainer">
+            <svg className="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <span className="brandText">Control Congresos</span>
+        </div>
+
+        {/* Botón de menú móvil */}
         <button
-          onClick={logout}
-          style={{ padding: '8px 16px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}
+          className="mobileMenuButton"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
         >
-          Cerrar Sesión
+          <svg className="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {isMobileMenuOpen ? (
+              <>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </>
+            ) : (
+              <>
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </>
+            )}
+          </svg>
         </button>
+
+        {/* Menú de navegación */}
+        <div className={`navLinks${isMobileMenuOpen ? ' navLinksOpen' : ''}`}>
+          <button
+            className={linkClass('/home')}
+            onClick={() => {
+              navigate('/home');
+              setIsMobileMenuOpen(false);
+            }}
+          >
+            <span className="linkIcon">🏠</span>
+            Inicio
+            {isActive('/home') && <span className="activeDot"></span>}
+          </button>
+
+          <button
+            className={linkClass('/eventos')}
+            onClick={() => {
+              navigate('/eventos');
+              setIsMobileMenuOpen(false);
+            }}
+          >
+            <span className="linkIcon">📅</span>
+            Eventos
+            {isActive('/eventos') && <span className="activeDot"></span>}
+          </button>
+
+          {user?.role === 'admin' && (
+            <button
+              className={linkClass('/sesiones')}
+              onClick={() => {
+                navigate('/sesiones');
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              <span className="linkIcon">📊</span>
+              Datos de Eventos
+              {isActive('/sesiones') && <span className="activeDot"></span>}
+            </button>
+          )}
+        </div>
+
+        {/* Sección de usuario */}
+        <div className="userSection">
+          <div className="userInfo">
+            <div className="userAvatar">
+              {user?.username?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <div className="userDetails">
+              <span className="userName">{user?.username || 'Usuario'}</span>
+              <span className="userRole">
+                {user?.role === 'admin' ? 'Administrador' : 'Usuario'}
+              </span>
+            </div>
+          </div>
+
+          <button className="logoutButton" onClick={logout}>
+            <svg className="logoutIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
     </nav>
   );

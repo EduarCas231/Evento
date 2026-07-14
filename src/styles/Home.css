@@ -1,0 +1,404 @@
+/* Home Styles */
+.homeContainer {
+  padding: 30px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.homeHeader {
+  margin-bottom: 32px;
+  padding: 24px 32px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.04);
+  animation: slideDown 0.6s ease;
+}
+
+.homeHeaderContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.homeTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.5px;
+}
+
+.homeSubtitle {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.homeUsername {
+  color: #406e9b;
+}
+
+.homeBadge {
+  background: linear-gradient(135deg, #406e9b 0%, #355a7a 100%);
+  padding: 8px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(64, 110, 155, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.homeBadgeText {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.homeLoading {
+  text-align: center;
+  padding: 60px 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.homeSpinner {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #406e9b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.homeLoadingText {
+  margin-top: 16px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.homeError {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #dc2626;
+  margin-bottom: 24px;
+  animation: shake 0.5s ease;
+}
+
+.homeErrorIcon {
+  width: 24px;
+  height: 24px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.homeEmpty {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  animation: fadeIn 0.6s ease;
+}
+
+.homeEmptyIcon {
+  width: 64px;
+  height: 64px;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+
+.homeEmptyTitle {
+  font-size: 20px;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.homeEmptyText {
+  font-size: 15px;
+  color: #6b7280;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.homeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  animation: fadeIn 0.8s ease;
+}
+
+/* Tarjeta de sesión en Home */
+.homeCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  background-color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.homeCardHovered {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(64, 110, 155, 0.25), 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.homeCardType {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.homeCardTypePublico {
+  background-color: rgba(64, 110, 155, 0.15);
+  color: #406e9b;
+  border: 1px solid #406e9b;
+}
+
+.homeCardTypePrivado {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.homeCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.homeCardCode {
+  font-size: 12px;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.homeCardTitle {
+  margin: 8px 0 6px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+
+.homeCardDescription {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.homeCardDetails {
+  font-size: 13px;
+  color: #475569;
+  line-height: 2;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.homeDetailItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.homeDetailIcon {
+  width: 20px;
+  text-align: center;
+}
+
+.homeProgressContainer {
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+
+.homeProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.homeProgressPercent {
+  font-weight: bold;
+}
+
+.homeProgressBar {
+  background: #e2e8f0;
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.homeProgressFill {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+}
+
+.homeAttendeesSimple {
+  margin-top: 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.homeCountdownContainer {
+  margin-top: 12px;
+  text-align: center;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.homeCountdownActive {
+  background-color: rgba(64, 110, 155, 0.08);
+  border-color: #406e9b;
+}
+
+.homeCountdownInactive {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.homeCountdownLabel {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.homeCountdownValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #406e9b;
+  font-family: monospace;
+  animation: pulse 1.5s infinite;
+}
+
+.homeCountdownFinished {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .homeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .homeHeader {
+    padding: 20px;
+  }
+
+  .homeTitle {
+    font-size: 22px;
+  }
+
+  .homeCard {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .homeContainer {
+    padding: 16px;
+  }
+
+  .homeHeader {
+    padding: 16px;
+  }
+
+  .homeTitle {
+    font-size: 20px;
+  }
+
+  .homeBadge {
+    padding: 6px 16px;
+  }
+
+  .homeBadgeText {
+    font-size: 12px;
+  }
+}

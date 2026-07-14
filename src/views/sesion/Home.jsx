@@ -3,14 +3,10 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotificaciones } from '../../hooks/useNotificaciones';
 import { useSSE } from '../../hooks/useSSE';
+import '../../styles/Home.css';
 
 const etiquetaTipo = (tipo) => (
-  <span style={{
-    fontSize: '11px', fontWeight: 'bold', padding: '3px 10px', borderRadius: '20px',
-    backgroundColor: tipo === 'privado' ? '#fff3cd' : '#d1ecf1',
-    color: tipo === 'privado' ? '#856404' : '#0c5460',
-    border: `1px solid ${tipo === 'privado' ? '#ffc107' : '#bee5eb'}`,
-  }}>
+  <span className={`homeCardType ${tipo === 'privado' ? 'homeCardTypePrivado' : 'homeCardTypePublico'}`}>
     {tipo === 'privado' ? '🔒 Privado' : '🌐 Público'}
   </span>
 );
@@ -27,79 +23,102 @@ function calcularRestante(fecha, horaInicio) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// Recibe ocupados/capacidad como props — actualizados por el polling del padre
-function TarjetaSesion({ sesion }) {
-  const [countdown, setCountdown] = useState(() => calcularRestante(sesion.fecha, sesion.hora_inicio));
+function TarjetaEvento({ evento, index }) {
+  const [countdown, setCountdown] = useState(() => calcularRestante(evento.fecha, evento.hora_inicio));
+  const [isHovered, setIsHovered] = useState(false);
   const notif5Ref = useRef(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const inicio = new Date(`${sesion.fecha}T${sesion.hora_inicio}`);
+      const inicio = new Date(`${evento.fecha}T${evento.hora_inicio}`);
       const diff = inicio - Date.now();
 
       if (diff > 240000 && diff <= 300000 && !notif5Ref.current) {
         if (Notification.permission === 'granted') {
-          new Notification(`⏰ Empieza en 5 min — ${sesion.titulo}`, {
-            body: `Inicia a las ${sesion.hora_inicio} en ${sesion.sala || 'su sala'}.`,
+          new Notification(`⏰ Empieza en 5 min — ${evento.titulo}`, {
+            body: `Inicia a las ${evento.hora_inicio} en ${evento.sala || 'su sala'}.`,
             icon: '/favicon.ico',
           });
         }
         notif5Ref.current = true;
       }
 
-      setCountdown(calcularRestante(sesion.fecha, sesion.hora_inicio));
+      setCountdown(calcularRestante(evento.fecha, evento.hora_inicio));
     }, 1000);
     return () => clearInterval(timer);
-  }, [sesion.fecha, sesion.hora_inicio, sesion.titulo, sesion.sala]);
+  }, [evento.fecha, evento.hora_inicio, evento.titulo, evento.sala]);
 
-  const ocupados = sesion.ocupados ?? 0;
-  const capacidad = sesion.capacidad;
+  const ocupados = evento.ocupados ?? 0;
+  const capacidad = evento.capacidad;
   const porcentaje = capacidad ? Math.round((ocupados / capacidad) * 100) : 0;
   const barColor = porcentaje >= 90 ? '#dc3545' : porcentaje >= 60 ? '#fd7e14' : '#28a745';
 
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', backgroundColor: '#fff' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <span style={{ fontSize: '12px', background: '#e9ecef', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', color: '#495057' }}>
-          Código: {sesion.code || '—'}
-        </span>
-        {etiquetaTipo(sesion.tipo)}
+    <div
+      className={`homeCard ${isHovered ? 'homeCardHovered' : ''}`}
+      style={{
+        animation: `slideUp 0.6s ease ${index * 0.1}s both`,
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="homeCardHeader">
+        <span className="homeCardCode">Código: {evento.code || '—'}</span>
+        {etiquetaTipo(evento.tipo)}
       </div>
 
-      <h3 style={{ margin: '6px 0', color: '#007bff' }}>{sesion.titulo}</h3>
-      <p style={{ color: '#555', fontSize: '14px', margin: '0 0 12px 0' }}>{sesion.detalles || 'Sin descripción.'}</p>
+      <h3 className="homeCardTitle">{evento.titulo}</h3>
+      <p className="homeCardDescription">{evento.detalles || 'Sin descripción.'}</p>
 
-      <div style={{ fontSize: '13px', color: '#666', lineHeight: '1.8' }}>
-        📍 <strong>Sala:</strong> {sesion.sala || '—'}<br />
-        📅 <strong>Fecha:</strong> {sesion.fecha || '—'}<br />
-        ⏰ <strong>Horario:</strong> {sesion.hora_inicio} - {sesion.hora_fin}<br />
-        👤 <strong>Organizador:</strong> {sesion.organizador || '—'}
+      <div className="homeCardDetails">
+        <div className="homeDetailItem">
+          <span className="homeDetailIcon">📍</span>
+          <span><strong>Sala:</strong> {evento.sala || '—'}</span>
+        </div>
+        <div className="homeDetailItem">
+          <span className="homeDetailIcon">📅</span>
+          <span><strong>Fecha:</strong> {evento.fecha || '—'}</span>
+        </div>
+        <div className="homeDetailItem">
+          <span className="homeDetailIcon">⏰</span>
+          <span><strong>Horario:</strong> {evento.hora_inicio} - {evento.hora_fin}</span>
+        </div>
+        <div className="homeDetailItem">
+          <span className="homeDetailIcon">👤</span>
+          <span><strong>Organizador:</strong> {evento.organizador || '—'}</span>
+        </div>
       </div>
 
       {capacidad ? (
-        <div style={{ marginTop: '14px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#555', marginBottom: '4px' }}>
+        <div className="homeProgressContainer">
+          <div className="homeProgressHeader">
             <span>👥 Asistentes: <strong>{ocupados}</strong> / {capacidad}</span>
-            <span style={{ color: barColor, fontWeight: 'bold' }}>{porcentaje}%</span>
+            <span className="homeProgressPercent" style={{ color: barColor }}>{porcentaje}%</span>
           </div>
-          <div style={{ background: '#e9ecef', borderRadius: '4px', height: '8px', overflow: 'hidden' }}>
-            <div style={{ width: `${porcentaje}%`, height: '100%', backgroundColor: barColor, transition: 'width 0.4s' }} />
+          <div className="homeProgressBar">
+            <div
+              className="homeProgressFill"
+              style={{
+                width: `${porcentaje}%`,
+                backgroundColor: barColor,
+              }}
+            />
           </div>
         </div>
       ) : (
-        <div style={{ marginTop: '14px', fontSize: '13px', color: '#666' }}>
+        <div className="homeAttendeesSimple">
           👥 Asistentes: <strong>{ocupados}</strong>
         </div>
       )}
 
-      <div style={{ marginTop: '12px', textAlign: 'center', padding: '8px', borderRadius: '6px', backgroundColor: countdown ? '#f0f7ff' : '#f8f9fa', border: `1px solid ${countdown ? '#b8daff' : '#dee2e6'}` }}>
+      <div className={`homeCountdownContainer ${countdown ? 'homeCountdownActive' : 'homeCountdownInactive'}`}>
         {countdown ? (
           <>
-            <div style={{ fontSize: '11px', color: '#6c757d', marginBottom: '2px' }}>⏳ Comienza en</div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#0056b3', fontFamily: 'monospace' }}>{countdown}</div>
+            <div className="homeCountdownLabel">⏳ Comienza en</div>
+            <div className="homeCountdownValue">{countdown}</div>
           </>
         ) : (
-          <div style={{ fontSize: '13px', color: '#6c757d' }}>🟢 Evento en curso o finalizado</div>
+          <div className="homeCountdownFinished">🟢 Evento en curso o finalizado</div>
         )}
       </div>
     </div>
@@ -114,16 +133,17 @@ export default function Home() {
 
   useNotificaciones(registrados);
   useSSE(setRegistrados);
+
   useEffect(() => {
     const cargar = async () => {
       try {
         const data = await api.sesiones.misRegistros();
         const enriquecidos = await Promise.all(
-          data.map(async s => {
+          data.map(async (s, index) => {
             try {
               const info = await api.sesiones.asistentes(s.id);
-              return { ...s, ocupados: info.ocupados, capacidad: info.capacidad ?? s.capacidad };
-            } catch { return s; }
+              return { ...s, ocupados: info.ocupados, capacidad: info.capacidad ?? s.capacidad, index };
+            } catch { return { ...s, index }; }
           })
         );
         setRegistrados(enriquecidos);
@@ -137,23 +157,60 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ margin: 0, color: '#333' }}>Mis Eventos</h1>
-        <p style={{ margin: '4px 0 0', color: '#666' }}>Bienvenido, <strong>{user?.username}</strong></p>
+    <div className="homeContainer">
+      <div className="homeHeader">
+        <div className="homeHeaderContent">
+          <div>
+            <h1 className="homeTitle">Mis Eventos</h1>
+            <p className="homeSubtitle">
+              Bienvenido, <strong className="homeUsername">{user?.username}</strong>
+            </p>
+          </div>
+          <div className="homeBadge">
+            <span className="homeBadgeText">
+              {registrados.length} {registrados.length === 1 ? 'Evento' : 'Eventos'}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: '40px' }}>Cargando...</div>}
-      {error && <div style={{ padding: '12px', backgroundColor: '#ffe6e6', color: 'red', borderRadius: '4px', marginBottom: '20px' }}>{error}</div>}
+      {loading && (
+        <div className="homeLoading">
+          <div className="homeSpinner"></div>
+          <p className="homeLoadingText">Cargando tus eventos...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="homeError">
+          <svg className="homeErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
 
       {!loading && !error && (
         registrados.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#888', padding: '40px', border: '1px dashed #ccc', borderRadius: '8px' }}>
-            Aún no estás registrado en ningún evento. Ve a <strong>Eventos</strong> para unirte.
-          </p>
+          <div className="homeEmpty">
+            <svg className="homeEmptyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <h3 className="homeEmptyTitle">Aún no estás registrado</h3>
+            <p className="homeEmptyText">
+              Ve a la sección <strong>Eventos</strong> para unirte a eventos disponibles.
+            </p>
+          </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-            {registrados.map((s) => <TarjetaSesion key={s.id} sesion={s} />)}
+          <div className="homeGrid">
+            {registrados.map((s) => (
+              <TarjetaEvento key={s.id} evento={s} index={s.index || 0} />
+            ))}
           </div>
         )
       )}

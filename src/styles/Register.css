@@ -1,0 +1,319 @@
+/* Register Styles */
+.registerContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #3a3a5c 100%);
+  padding: 20px;
+}
+
+.registerCard {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 45px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(64, 110, 155, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  animation: slideUp 0.6s ease;
+}
+
+.registerHeader {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.registerLogoContainer {
+  display: inline-flex;
+  padding: 14px;
+  background: #406e9b;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(64, 110, 155, 0.3);
+}
+
+.registerLogo {
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.registerTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.registerSubtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+}
+
+.registerError {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  animation: shake 0.5s ease;
+}
+
+.registerErrorIcon {
+  width: 20px;
+  height: 20px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.registerErrorText {
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.registerSuccess {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.registerSuccessIcon {
+  width: 20px;
+  height: 20px;
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.registerSuccessText {
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.registerInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.registerLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.3px;
+}
+
+.registerInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.registerInputIcon {
+  position: absolute;
+  left: 14px;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.registerInput {
+  width: 100%;
+  padding: 14px 14px 14px 48px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  font-size: 15px;
+  color: #1a1a2e;
+  background-color: #f9fafb;
+  transition: all 0.3s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.registerInput:focus {
+  border-color: #406e9b;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(64, 110, 155, 0.15);
+}
+
+.registerInput:hover {
+  border-color: #9ca3af;
+}
+
+.registerInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.registerButton {
+  width: 100%;
+  padding: 16px;
+  background: #406e9b;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  box-shadow: 0 4px 15px rgba(64, 110, 155, 0.3);
+}
+
+.registerButton:hover:not(:disabled) {
+  background: #355a7a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(64, 110, 155, 0.4);
+}
+
+.registerButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.registerButtonDisabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.registerButtonDisabled:hover {
+  background: #9ca3af;
+  transform: none;
+  box-shadow: none;
+}
+
+.registerLoadingSpinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.registerSpinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.registerFooter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.registerFooterText {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.registerLinkButton {
+  background: none;
+  border: none;
+  color: #406e9b;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.registerLinkButton:hover {
+  color: #355a7a;
+  text-decoration: underline;
+}
+
+.registerLinkButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .registerCard {
+    padding: 30px 20px;
+  }
+
+  .registerTitle {
+    font-size: 22px;
+  }
+
+  .registerInput {
+    font-size: 16px;
+    padding: 14px 14px 14px 44px;
+  }
+
+  .registerButton {
+    padding: 16px;
+    font-size: 15px;
+  }
+}

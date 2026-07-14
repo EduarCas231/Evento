@@ -2,14 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import '../../styles/SesionList.css';
 
 const etiquetaTipo = (tipo) => (
-  <span style={{
-    fontSize: '11px', fontWeight: 'bold', padding: '2px 8px', borderRadius: '20px',
-    backgroundColor: tipo === 'privado' ? '#fff3cd' : '#d1ecf1',
-    color: tipo === 'privado' ? '#856404' : '#0c5460',
-    border: `1px solid ${tipo === 'privado' ? '#ffc107' : '#bee5eb'}`,
-  }}>
+  <span className={`sesionListCardType ${tipo === 'privado' ? 'sesionListCardTypePrivado' : 'sesionListCardTypePublico'}`}>
     {tipo === 'privado' ? '🔒 Privado' : '🌐 Público'}
   </span>
 );
@@ -19,30 +15,37 @@ function BarraAsistencia({ asistentes, capacidad }) {
   const ocupados = asistentes || 0;
   const disponibles = total > 0 ? total - ocupados : null;
   const porcentaje = total > 0 ? Math.min((ocupados / total) * 100, 100) : 0;
-  const color = porcentaje >= 90 ? '#dc3545' : porcentaje >= 60 ? '#ffc107' : '#28a745';
+  const color = porcentaje >= 90 ? '#dc3545' : porcentaje >= 60 ? '#fd7e14' : '#28a745';
 
   return (
-    <div style={{ marginTop: '12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
+    <div className="sesionListBarraContainer">
+      <div className="sesionListBarraHeader">
         <span>👥 <strong>{ocupados}</strong> asistentes registrados</span>
         {disponibles !== null && (
-          <span style={{ color: disponibles === 0 ? '#dc3545' : '#28a745', fontWeight: 'bold' }}>
+          <span className={`sesionListBarraStatus ${disponibles === 0 ? 'sesionListBarraStatusFull' : 'sesionListBarraStatusAvailable'}`}>
             {disponibles === 0 ? '🚫 Sin lugares' : `✅ ${disponibles} lugares disponibles`}
           </span>
         )}
       </div>
       {total > 0 && (
-        <div style={{ backgroundColor: '#e9ecef', borderRadius: '4px', height: '8px', overflow: 'hidden' }}>
-          <div style={{ width: `${porcentaje}%`, backgroundColor: color, height: '100%', borderRadius: '4px', transition: 'width 0.3s' }} />
+        <div className="sesionListBarraBackground">
+          <div 
+            className="sesionListBarraFill"
+            style={{
+              width: `${porcentaje}%`,
+              backgroundColor: color,
+            }}
+          />
         </div>
       )}
     </div>
   );
 }
 
-function TarjetaDetalle({ sesion, onEditar, onEliminar }) {
+function TarjetaDetalle({ sesion, onEditar, onEliminar, index }) {
   const [asistentes, setAsistentes] = useState(null);
   const [loadingA, setLoadingA] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     api.sesiones.asistentes(sesion.id)
@@ -52,43 +55,65 @@ function TarjetaDetalle({ sesion, onEditar, onEliminar }) {
   }, [sesion.id]);
 
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#fff', boxShadow: '0 2px 6px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
-      {/* Header tarjeta */}
-      <div style={{ backgroundColor: '#f8f9fa', padding: '14px 20px', borderBottom: '1px solid #dee2e6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ background: '#e9ecef', padding: '3px 10px', borderRadius: '4px', fontWeight: 'bold', fontSize: '12px', color: '#495057' }}>
-            {sesion.code || '—'}
-          </span>
+    <div
+      className={`sesionListCard ${isHovered ? 'sesionListCardHovered' : ''}`}
+      style={{
+        animation: `slideUp 0.6s ease ${index * 0.1}s both`,
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="sesionListCardHeader">
+        <div className="sesionListCardHeaderLeft">
+          <span className="sesionListCardCode">{sesion.code || '—'}</span>
           {etiquetaTipo(sesion.tipo)}
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={onEditar} style={{ padding: '5px 14px', backgroundColor: '#ffc107', color: '#212529', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
-            Editar
+        <div className="sesionListCardActions">
+          <button onClick={onEditar} className="sesionListEditButton">
+            ✏️ Editar
           </button>
-          <button onClick={onEliminar} style={{ padding: '5px 14px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
-            Eliminar
+          <button onClick={onEliminar} className="sesionListDeleteButton">
+            🗑️ Eliminar
           </button>
         </div>
       </div>
 
-      {/* Cuerpo */}
-      <div style={{ padding: '20px' }}>
-        <h3 style={{ margin: '0 0 8px', color: '#007bff' }}>{sesion.titulo}</h3>
-        <p style={{ color: '#555', fontSize: '14px', margin: '0 0 16px' }}>{sesion.detalles || 'Sin descripción.'}</p>
+      <div className="sesionListCardBody">
+        <h3 className="sesionListCardTitle">{sesion.titulo}</h3>
+        <p className="sesionListCardDescription">{sesion.detalles || 'Sin descripción.'}</p>
 
-        {/* Grid de datos */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px', color: '#555' }}>
-          <div>📍 <strong>Sala:</strong> {sesion.sala || '—'}</div>
-          <div>🗺️ <strong>Zona:</strong> {sesion.zona || '—'}</div>
-          <div>📅 <strong>Fecha:</strong> {sesion.fecha || '—'}</div>
-          <div>⏰ <strong>Horario:</strong> {sesion.hora_inicio} - {sesion.hora_fin}</div>
-          <div>🎯 <strong>Capacidad:</strong> {sesion.capacidad ? `${sesion.capacidad} personas` : '—'}</div>
-          <div>👤 <strong>Organizador:</strong> {sesion.organizador || '—'}</div>
+        <div className="sesionListInfoGrid">
+          <div className="sesionListInfoItem">
+            <span className="sesionListInfoIcon">📍</span>
+            <span><strong>Sala:</strong> {sesion.sala || '—'}</span>
+          </div>
+          <div className="sesionListInfoItem">
+            <span className="sesionListInfoIcon">🗺️</span>
+            <span><strong>Zona:</strong> {sesion.zona || '—'}</span>
+          </div>
+          <div className="sesionListInfoItem">
+            <span className="sesionListInfoIcon">📅</span>
+            <span><strong>Fecha:</strong> {sesion.fecha || '—'}</span>
+          </div>
+          <div className="sesionListInfoItem">
+            <span className="sesionListInfoIcon">⏰</span>
+            <span><strong>Horario:</strong> {sesion.hora_inicio} - {sesion.hora_fin}</span>
+          </div>
+          <div className="sesionListInfoItem">
+            <span className="sesionListInfoIcon">🎯</span>
+            <span><strong>Capacidad:</strong> {sesion.capacidad ? `${sesion.capacidad} personas` : '—'}</span>
+          </div>
+          <div className="sesionListInfoItem">
+            <span className="sesionListInfoIcon">👤</span>
+            <span><strong>Organizador:</strong> {sesion.organizador || '—'}</span>
+          </div>
         </div>
 
-        {/* Barra de asistencia */}
         {loadingA ? (
-          <p style={{ fontSize: '13px', color: '#888', marginTop: '12px' }}>Cargando asistencia...</p>
+          <div className="sesionListLoadingAsistencia">
+            <span className="sesionListSmallSpinner"></span>
+            <span>Cargando asistencia...</span>
+          </div>
         ) : (
           <BarraAsistencia asistentes={asistentes} capacidad={sesion.capacidad} />
         )}
@@ -107,7 +132,6 @@ export default function SesionList() {
   useEffect(() => {
     api.sesiones.listar()
       .then((data) => {
-        // Filtrar solo los eventos del admin logueado
         const propios = data.filter((s) => s.organizador === user?.username);
         setSesiones(propios);
       })
@@ -116,7 +140,7 @@ export default function SesionList() {
   }, [user]);
 
   const handleEliminar = async (id) => {
-    if (!window.confirm('¿Eliminar esta sesión?')) return;
+    if (!window.confirm('¿Estás seguro de eliminar esta sesión?')) return;
     try {
       await api.sesiones.eliminar(id);
       setSesiones((prev) => prev.filter((s) => s.id !== id));
@@ -125,35 +149,69 @@ export default function SesionList() {
     }
   };
 
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Cargando sesiones...</div>;
+  if (loading) {
+    return (
+      <div className="sesionListLoadingContainer">
+        <div className="sesionListSpinner"></div>
+        <p className="sesionListLoadingText">Cargando tus sesiones...</p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '30px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <div>
-          <h2 style={{ margin: 0 }}>Mis Sesiones</h2>
-          <p style={{ margin: '4px 0 0', color: '#666', fontSize: '14px' }}>{sesiones.length} evento{sesiones.length !== 1 ? 's' : ''} creado{sesiones.length !== 1 ? 's' : ''}</p>
+    <div className="sesionListContainer">
+      <div className="sesionListHeader">
+        <div className="sesionListHeaderContent">
+          <div>
+            <h1 className="sesionListTitle">Mis Sesiones</h1>
+            <p className="sesionListSubtitle">
+              {sesiones.length} evento{sesiones.length !== 1 ? 's' : ''} creado{sesiones.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/sesiones/nueva')}
+            className="sesionListCreateButton"
+          >
+            <svg className="sesionListCreateIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Nueva Sesión
+          </button>
         </div>
-        <button
-          onClick={() => navigate('/sesiones/nueva')}
-          style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          + Nueva Sesión
-        </button>
       </div>
 
-      {error && <div style={{ padding: '12px', backgroundColor: '#ffe6e6', color: 'red', borderRadius: '4px', marginBottom: '16px' }}>{error}</div>}
+      {error && (
+        <div className="sesionListError">
+          <svg className="sesionListErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
 
       {sesiones.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#666', padding: '40px', border: '1px dashed #ccc', borderRadius: '8px' }}>
-          Aún no has creado ninguna sesión.
-        </p>
+        <div className="sesionListEmpty">
+          <svg className="sesionListEmptyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <h3 className="sesionListEmptyTitle">Aún no has creado sesiones</h3>
+          <p className="sesionListEmptyText">
+            Comienza creando tu primera sesión para el congreso
+          </p>
+        </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>
-          {sesiones.map((s) => (
+        <div className="sesionListGrid">
+          {sesiones.map((s, index) => (
             <TarjetaDetalle
               key={s.id}
               sesion={s}
+              index={index}
               onEditar={() => navigate(`/sesiones/editar/${s.id}`)}
               onEliminar={() => handleEliminar(s.id)}
             />
