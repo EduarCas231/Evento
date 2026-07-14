@@ -69,5 +69,16 @@ export const api = {
     eliminar: (id) => apiFetch(`/sesiones/${id}`, { method: 'DELETE' }),
     unirse: (code, password) => apiFetch('/asistentes/unirse', { method: 'POST', body: JSON.stringify({ code, ...(password ? { password } : {}) }) }),
     cambiarVisibilidad: (id, tipo) => apiFetch(`/sesiones/${id}/visibilidad`, { method: 'PUT', body: JSON.stringify({ tipo }) }),
+    iniciar: (id) => apiFetch(`/sesiones/${id}/iniciar`, { method: 'PUT' }),
+    finalizar: (id) => apiFetch(`/sesiones/${id}/finalizar`, { method: 'PUT' }),
+  },
+
+  // QR / Asistencia (check-in)
+  qr: {
+    // No es un fetch normal: se usa como src de <img>, por eso arma la URL
+    // directo (el backend acepta el token por query param, igual que SSE).
+    miPaseUrl: (idSesion, token) => `${BASE_URL}/asistentes/mi-qr/${idSesion}?token=${token}`,
+    escanear: (qrToken) => apiFetch('/asistentes/escanear', { method: 'POST', body: JSON.stringify({ qr_token: qrToken }) }),
+    flujo: (idSesion) => apiFetch(`/asistentes/flujo/${idSesion}`, { method: 'GET' }),
   },
 };

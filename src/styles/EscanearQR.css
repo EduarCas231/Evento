@@ -1,0 +1,151 @@
+.escanearContainer {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.escanearHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.escanearTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.escanearVolverButton {
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.escanearVolverButton:hover {
+  background-color: #e5e7eb;
+}
+
+.escanearEventoTitulo {
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.escanearSubtitle {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.escanearLectorWrapper {
+  background-color: #f9fafb;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.escanearPausado {
+  padding: 60px 20px;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.escanearPausarButton {
+  margin-top: 12px;
+  padding: 8px 20px;
+  background-color: #1f2937;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.escanearHistorial {
+  background-color: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.escanearHistorialTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.escanearHistorialVacio {
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+
+.escanearHistorialLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.escanearHistorialItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border-left: 4px solid transparent;
+}
+
+.escanearHistorialItem--ok {
+  background-color: #f0fdf4;
+  border-left-color: #22c55e;
+}
+
+.escanearHistorialItem--repetido {
+  background-color: #fffbeb;
+  border-left-color: #f59e0b;
+}
+
+.escanearHistorialItem--error {
+  background-color: #fef2f2;
+  border-left-color: #ef4444;
+}
+
+.escanearHistorialIcono {
+  font-size: 18px;
+}
+
+.escanearHistorialTexto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  font-size: 13px;
+}
+
+.escanearHistorialTexto strong {
+  color: #1f2937;
+}
+
+.escanearHistorialTexto span {
+  color: #6b7280;
+}
+
+.escanearHistorialHora {
+  font-size: 12px;
+  color: #9ca3af;
+  white-space: nowrap;
+}

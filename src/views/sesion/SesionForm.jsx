@@ -61,13 +61,52 @@ export default function SesionForm() {
     setError('');
     setSuccess('');
     setLoading(true);
+
+    if (!form.titulo.trim()) {
+      setError('El título es obligatorio.');
+      setLoading(false);
+      return;
+    }
+
+    if (!form.fecha || !form.hora_inicio || !form.hora_fin) {
+      setError('Fecha, hora de inicio y hora de fin son obligatorios.');
+      setLoading(false);
+      return;
+    }
+
+    if (!form.capacidad || Number(form.capacidad) <= 0) {
+      setError('La capacidad debe ser un número mayor que cero.');
+      setLoading(false);
+      return;
+    }
+
+    if (form.tipo === 'privado' && !form.password.trim()) {
+      setError('La contraseña es obligatoria para eventos privados.');
+      setLoading(false);
+      return;
+    }
+
+    const payload = {
+      titulo: form.titulo,
+      sala: form.sala,
+      code: form.code || undefined,
+      capacidad: form.capacidad ? Number(form.capacidad) : 0,
+      detalles: form.detalles,
+      fecha: form.fecha,
+      hora_inicio: form.hora_inicio,
+      hora_fin: form.hora_fin,
+      zona: form.zona,
+      tipo: form.tipo,
+      ...(form.tipo === 'privado' ? { password: form.password } : {}),
+    };
+
     try {
       if (esEdicion) {
-        await api.sesiones.editar(id, form);
-        setSuccess('¡Sesión actualizada con éxito!');
+        await api.sesiones.editar(id, payload);
+        setSuccess('¡Evento actualizado con éxito!');
       } else {
-        await api.sesiones.crear(form);
-        setSuccess('¡Sesión creada con éxito!');
+        await api.sesiones.crear(payload);
+        setSuccess('¡Evento creado con éxito!');
       }
       setTimeout(() => {
         navigate('/datos-sesion');
@@ -139,12 +178,12 @@ export default function SesionForm() {
             </svg>
           </div>
           <h1 className="formTitle">
-            {esEdicion ? 'Editar Sesión' : 'Nueva Sesión'}
+            {esEdicion ? 'Editar Evento' : 'Nuevo Evento'}
           </h1>
           <p className="formSubtitle">
             {esEdicion 
-              ? 'Actualiza la información de la sesión' 
-              : 'Completa los datos para crear una nueva sesión'}
+              ? 'Actualiza la información del evento' 
+              : 'Completa los datos para crear un nuevo evento'}
           </p>
         </div>
 
@@ -174,7 +213,7 @@ export default function SesionForm() {
             {campo('Título *', 'titulo', 'text', 'Ej. Conferencia inaugural')}
             {campo('Código', 'code', 'text', 'Ej. CONF-01')}
             {campo('Sala', 'sala', 'text', 'Ej. Auditorio A')}
-            {campo('Zona Wearable', 'zona', 'text', 'Ej. Zona Norte')}
+            {campo('Zona', 'zona', 'text', 'Ej. Zona Norte')}
             {campo('Capacidad', 'capacidad', 'number', 'Ej. 200')}
             {campo('Fecha', 'fecha', 'date')}
           </div>

@@ -11,11 +11,30 @@ const etiquetaTipo = (tipo) => (
   </span>
 );
 
-function calcularRestante(fecha, horaInicio) {
-  if (!fecha || !horaInicio) return null;
-  const inicio = new Date(`${fecha}T${horaInicio}`);
-  const diff = inicio - Date.now();
-  if (diff <= 0) return null;
+function obtenerEstadoInfo(estado) {
+  const config = {
+    pendiente: { texto: '⏳ Pendiente', clase: 'homeCardStatePendiente', label: 'Comienza en' },
+    en_curso: { texto: '🔥 En curso', clase: 'homeCardStateEnCurso', label: 'Termina en' },
+    finalizado: { texto: '✅ Finalizado', clase: 'homeCardStateFinalizado', label: 'Evento finalizado' },
+  };
+  return config[estado] || { texto: '🔷 Disponible', clase: 'homeCardStateDefault', label: 'Estado' };
+}
+
+function calcularTemporizador(evento) {
+  if (!evento?.fecha || !evento?.hora_inicio) return null;
+  const ahora = Date.now();
+  const inicio = new Date(`${evento.fecha}T${evento.hora_inicio}`);
+  const fin = evento.hora_fin ? new Date(`${evento.fecha}T${evento.hora_fin}`) : null;
+
+  let diff = null;
+  if (evento.estado === 'pendiente') {
+    diff = inicio - ahora;
+  } else if (evento.estado === 'en_curso' && fin) {
+    diff = fin - ahora;
+  }
+
+  if (!diff || diff <= 0) return null;
+
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   const s = Math.floor((diff % 60000) / 1000);
@@ -24,7 +43,8 @@ function calcularRestante(fecha, horaInicio) {
 }
 
 function TarjetaEvento({ evento, index }) {
-  const [countdown, setCountdown] = useState(() => calcularRestante(evento.fecha, evento.hora_inicio));
+  const estadoInfo = obtenerEstadoInfo(evento.estado);
+  const [countdown, setCountdown] = useState(() => calcularTemporizador(evento));
   const [isHovered, setIsHovered] = useState(false);
   const notif5Ref = useRef(false);
 
@@ -33,7 +53,7 @@ function TarjetaEvento({ evento, index }) {
       const inicio = new Date(`${evento.fecha}T${evento.hora_inicio}`);
       const diff = inicio - Date.now();
 
-      if (diff > 240000 && diff <= 300000 && !notif5Ref.current) {
+      if (evento.estado === 'pendiente' && diff > 240000 && diff <= 300000 && !notif5Ref.current) {
         if (Notification.permission === 'granted') {
           new Notification(`⏰ Empieza en 5 min — ${evento.titulo}`, {
             body: `Inicia a las ${evento.hora_inicio} en ${evento.sala || 'su sala'}.`,
@@ -43,10 +63,10 @@ function TarjetaEvento({ evento, index }) {
         notif5Ref.current = true;
       }
 
-      setCountdown(calcularRestante(evento.fecha, evento.hora_inicio));
+      setCountdown(calcularTemporizador(evento));
     }, 1000);
     return () => clearInterval(timer);
-  }, [evento.fecha, evento.hora_inicio, evento.titulo, evento.sala]);
+  }, [evento, evento.fecha, evento.hora_inicio, evento.hora_fin, evento.estado, evento.titulo, evento.sala]);
 
   const ocupados = evento.ocupados ?? 0;
   const capacidad = evento.capacidad;
@@ -64,7 +84,10 @@ function TarjetaEvento({ evento, index }) {
     >
       <div className="homeCardHeader">
         <span className="homeCardCode">Código: {evento.code || '—'}</span>
-        {etiquetaTipo(evento.tipo)}
+        <div className="homeCardHeaderRight">
+          {etiquetaTipo(evento.tipo)}
+          <span className={`homeCardState ${estadoInfo.clase}`}>{estadoInfo.texto}</span>
+        </div>
       </div>
 
       <h3 className="homeCardTitle">{evento.titulo}</h3>
@@ -112,13 +135,17 @@ function TarjetaEvento({ evento, index }) {
       )}
 
       <div className={`homeCountdownContainer ${countdown ? 'homeCountdownActive' : 'homeCountdownInactive'}`}>
-        {countdown ? (
+        {evento.estado === 'finalizado' ? (
+          <div className="homeCountdownFinished">✅ Evento finalizado</div>
+        ) : countdown ? (
           <>
-            <div className="homeCountdownLabel">⏳ Comienza en</div>
+            <div className="homeCountdownLabel">{estadoInfo.label}</div>
             <div className="homeCountdownValue">{countdown}</div>
           </>
         ) : (
-          <div className="homeCountdownFinished">🟢 Evento en curso o finalizado</div>
+          <div className="homeCountdownFinished">
+            {evento.estado === 'en_curso' ? '🔥 En curso' : '⏳ Temporizador activo pronto'}
+          </div>
         )}
       </div>
     </div>

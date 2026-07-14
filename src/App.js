@@ -9,6 +9,7 @@ import Home from './views/sesion/Home';
 import Eventos from './views/sesion/Eventos';
 import DatosSesion from './views/sesion/DatosSesion';
 import SesionForm from './views/sesion/SesionForm';
+import EscanearQR from './views/sesion/EscanearQR';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/datos-sesion" element={<ProtectedRoute><DatosSesion /></ProtectedRoute>} />
           <Route path="/sesiones/nueva" element={<ProtectedRoute><SesionForm /></ProtectedRoute>} />
           <Route path="/sesiones/editar/:id" element={<ProtectedRoute><SesionForm /></ProtectedRoute>} />
+          <Route path="/sesiones/escanear/:id" element={<ProtectedRoute><EscanearQR /></ProtectedRoute>} />
 
           {/* Redirección automática */}
           <Route path="/" element={<Navigate to="/login" />} />

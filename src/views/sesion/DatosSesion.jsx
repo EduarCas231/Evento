@@ -6,19 +6,23 @@ import { useAuth } from '../../context/AuthContext';
 import { useSesiones } from '../../context/SesionesContext';
 import '../../styles/DatosSesion.css';
 
-// ============================================
-// COMPONENTE: Etiqueta de Tipo
-// ============================================
 const EtiquetaTipo = ({ tipo }) => (
   <span className={`datosSesionEtiqueta ${tipo === 'privado' ? 'datosSesionEtiquetaPrivado' : 'datosSesionEtiquetaPublico'}`}>
     {tipo === 'privado' ? '🔒 Privado' : '🌐 Público'}
   </span>
 );
 
-// ============================================
-// COMPONENTE: Barra de Asistencia
-// ============================================
-const BarraAsistencia = ({ ocupados, capacidad }) => {
+const EtiquetaEstado = ({ estado }) => {
+  const config = {
+    pendiente: { texto: '⏳ Pendiente', clase: 'datosSesionEstadoPendiente' },
+    en_curso: { texto: '🟢 En curso', clase: 'datosSesionEstadoEnCurso' },
+    finalizado: { texto: '🏁 Finalizado', clase: 'datosSesionEstadoFinalizado' },
+  };
+  const { texto, clase } = config[estado] || config.pendiente;
+  return <span className={`datosSesionEtiquetaEstado ${clase}`}>{texto}</span>;
+};
+
+const BarraAsistencia = ({ ocupados, capacidad, etiqueta }) => {
   const total = parseInt(capacidad) || 0;
   const disponibles = total > 0 ? total - ocupados : null;
   const porcentaje = total > 0 ? Math.min((ocupados / total) * 100, 100) : 0;
@@ -27,7 +31,7 @@ const BarraAsistencia = ({ ocupados, capacidad }) => {
   return (
     <div className="datosSesionBarraContainer">
       <div className="datosSesionBarraHeader">
-        <span>👥 <strong>{ocupados}</strong> asistentes registrados</span>
+        <span>👥 <strong>{ocupados}</strong> {etiqueta}</span>
         {disponibles !== null && (
           <span className={`datosSesionBarraDisponibles ${disponibles === 0 ? 'datosSesionBarraLleno' : 'datosSesionBarraDisponible'}`}>
             {disponibles === 0 ? '🚫 Sin lugares' : `✅ ${disponibles} lugares disponibles`}
@@ -49,13 +53,12 @@ const BarraAsistencia = ({ ocupados, capacidad }) => {
   );
 };
 
-// ============================================
-// COMPONENTE: Panel de Evento
-// ============================================
-const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
+const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinalizar, index }) => {
+  const navigate = useNavigate();
   const [datos, setDatos] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [isHovered, setIsHovered] = React.useState(false);
+  const [cambiandoEstado, setCambiandoEstado] = React.useState(false);
 
   const cargarAsistentes = React.useCallback(() => {
     setLoading(true);
@@ -65,9 +68,6 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
       .finally(() => setLoading(false));
   }, [evento.id]);
 
-  // 👇 FIX: ahora también se dispara cuando el Context actualiza evento.ocupados vía SSE
-  // (antes solo dependía de evento.id/evento.capacidad, que casi nunca cambian,
-  // por eso la tabla de participantes se quedaba congelada hasta refrescar)
   React.useEffect(() => {
     cargarAsistentes();
   }, [evento.id, evento.ocupados, cargarAsistentes]);
@@ -82,6 +82,32 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
     }
   };
 
+  const handleIniciar = async () => {
+    if (!window.confirm('¿Iniciar este evento ahora? Se notificará a todos los inscritos.')) return;
+    setCambiandoEstado(true);
+    try {
+      await onIniciar(evento.id);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCambiandoEstado(false);
+    }
+  };
+
+  const handleFinalizar = async () => {
+    if (!window.confirm('¿Finalizar este evento ahora?')) return;
+    setCambiandoEstado(true);
+    try {
+      await onFinalizar(evento.id);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCambiandoEstado(false);
+    }
+  };
+
+  const etiquetaAsistencia = evento.estado === 'pendiente' ? 'registrados' : 'con pase generado';
+
   return (
     <div 
       className={`datosSesionPanel ${isHovered ? 'datosSesionPanelHovered' : ''}`}
@@ -93,8 +119,27 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
         <div className="datosSesionPanelHeaderLeft">
           <span className="datosSesionPanelCode">{evento.code || '—'}</span>
           <EtiquetaTipo tipo={evento.tipo} />
+          <EtiquetaEstado estado={evento.estado} />
         </div>
         <div className="datosSesionPanelActions">
+          {evento.estado === 'pendiente' && (
+            <button onClick={handleIniciar} disabled={cambiandoEstado} className="datosSesionStartButton">
+              ▶️ Iniciar evento
+            </button>
+          )}
+          {evento.estado === 'en_curso' && (
+            <button onClick={handleFinalizar} disabled={cambiandoEstado} className="datosSesionEndButton">
+              ⏹️ Finalizar evento
+            </button>
+          )}
+          <button
+            onClick={() => navigate(`/sesiones/escanear/${evento.id}`)}
+            className="datosSesionScanButton"
+            disabled={evento.estado !== 'en_curso'}
+            title={evento.estado !== 'en_curso' ? 'El evento debe estar en curso para escanear' : 'Ir al escáner'}
+          >
+            📷 Escanear
+          </button>
           <button onClick={onEditar} className="datosSesionEditButton">
             ✏️ Editar
           </button>
@@ -141,12 +186,14 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
             <span>Cargando asistencia...</span>
           </div>
         ) : (
-          <BarraAsistencia ocupados={datos?.ocupados ?? 0} capacidad={evento.capacidad} />
+          <BarraAsistencia ocupados={datos?.ocupados ?? 0} capacidad={evento.capacidad} etiqueta={etiquetaAsistencia} />
         )}
 
         <div className="datosSesionParticipantesContainer">
           <div className="datosSesionParticipantesHeader">
-            <h4 className="datosSesionParticipantesTitle">👥 Participantes</h4>
+            <h4 className="datosSesionParticipantesTitle">
+              {evento.estado === 'pendiente' ? '👥 Participantes' : '✅ Asistencia'}
+            </h4>
             <span className="datosSesionParticipantesCount">
               {datos?.asistentes?.length || 0} {datos?.asistentes?.length === 1 ? 'participante' : 'participantes'}
             </span>
@@ -172,6 +219,7 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
                     <th className="datosSesionTableCell">Nombre</th>
                     <th className="datosSesionTableCell">Email</th>
                     <th className="datosSesionTableCell">Registro</th>
+                    <th className="datosSesionTableCell">Asistencia</th>
                     <th className="datosSesionTableCell datosSesionTableCellRight">Acción</th>
                   </tr>
                 </thead>
@@ -182,6 +230,13 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
                       <td className="datosSesionTableCell datosSesionTableCellEmail">{a.email}</td>
                       <td className="datosSesionTableCell datosSesionTableCellFecha">
                         {a.hora_ingreso || a.fecha_registro || '—'}
+                      </td>
+                      <td className="datosSesionTableCell">
+                        {a.presente ? (
+                          <span title={a.check_in_hora || ''}>✅ Presente</span>
+                        ) : (
+                          <span>⏳ Sin escanear</span>
+                        )}
                       </td>
                       <td className="datosSesionTableCell datosSesionTableCellRight">
                         <button
@@ -203,23 +258,17 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
   );
 };
 
-// ============================================
-// COMPONENTE PRINCIPAL: DatosEvento
-// ============================================
 export default function DatosEvento() {
   const { user } = useAuth();
   const navigate = useNavigate();
   
-  // 👇 Usamos el contexto global
   const { sesiones, loading, error, setSesiones, conectado, recargar } = useSesiones();
 
-  // Filtrar solo los eventos del usuario actual
   const misEventos = useMemo(() => {
     if (!user || !sesiones.length) return [];
     return sesiones.filter(s => s.organizador === user.username);
   }, [sesiones, user]);
 
-  // Calcular capacidad total
   const capacidadTotal = useMemo(() => {
     return misEventos.reduce((acc, s) => acc + (s.capacidad || 0), 0);
   }, [misEventos]);
@@ -228,11 +277,18 @@ export default function DatosEvento() {
     if (!window.confirm('¿Estás seguro de eliminar este evento?')) return;
     try {
       await api.sesiones.eliminar(id);
-      // Actualizar el contexto
       setSesiones((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       alert(err.message);
     }
+  };
+
+  const handleIniciarEvento = async (id) => {
+    await api.sesiones.iniciar(id);
+  };
+
+  const handleFinalizarEvento = async (id) => {
+    await api.sesiones.finalizar(id);
   };
 
   if (loading) {
@@ -305,6 +361,8 @@ export default function DatosEvento() {
               index={index}
               onEditar={() => navigate(`/sesiones/editar/${s.id}`)}
               onEliminarSesion={() => handleEliminarEvento(s.id)}
+              onIniciar={handleIniciarEvento}
+              onFinalizar={handleFinalizarEvento}
             />
           ))}
         </div>
