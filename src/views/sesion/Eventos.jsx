@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+// pages/Eventos.jsx
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useSesiones } from '../../context/SesionesContext';
 import '../../styles/Eventos.css';
 
 const etiquetaTipo = (tipo) => (
@@ -10,7 +12,7 @@ const etiquetaTipo = (tipo) => (
   </span>
 );
 
-function TarjetaUnirse({ sesion, index }) {
+function TarjetaUnirse({ sesion, index, onJoinSuccess }) {
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState({ texto: '', tipo: '' });
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,11 @@ function TarjetaUnirse({ sesion, index }) {
       const data = await api.sesiones.unirse(sesion.code, sesion.tipo === 'privado' ? password : undefined);
       setMsg({ texto: data.message || '¡Te uniste al evento!', tipo: 'ok' });
       setUnido(true);
+      
+      // Notificar al contexto que hubo un cambio
+      if (onJoinSuccess) {
+        onJoinSuccess(sesion.id);
+      }
     } catch (err) {
       setMsg({ texto: err.message, tipo: 'error' });
     } finally {
@@ -185,38 +192,57 @@ function TarjetaAdmin({ sesion, onEditar, onEliminar, index }) {
 }
 
 export default function Eventos() {
-  const [sesiones, setSesiones] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [busqueda, setBusqueda] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
+  
+  // 👇 Usamos el contexto en lugar de estado local
+  const { sesiones, loading, error, conectado, setSesiones, recargar } = useSesiones();
+  
+  const [busqueda, setBusqueda] = useState('');
+  const [joiningId, setJoiningId] = useState(null);
 
-  useEffect(() => {
-    api.sesiones.listar()
-      .then(setSesiones)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+  // Función para manejar el éxito al unirse
+  const handleJoinSuccess = (id) => {
+    setJoiningId(id);
+    // Recargar datos para actualizar la lista de asistentes
+    recargar();
+    // Después de un momento, limpiar el estado
+    setTimeout(() => setJoiningId(null), 3000);
+  };
 
   const handleEliminar = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este evento?')) return;
     try {
       await api.sesiones.eliminar(id);
+      // Actualizar el contexto eliminando la sesión
       setSesiones((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       alert(err.message);
     }
   };
 
-  const filtradas = busqueda.trim()
-    ? sesiones.filter((s) =>
-        s.organizador?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        s.code?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        s.sala?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        s.titulo?.toLowerCase().includes(busqueda.toLowerCase())
-      )
-    : sesiones;
+  // Filtrar sesiones según búsqueda
+  const filtradas = useMemo(() => {
+    if (!sesiones.length) return [];
+    
+    if (!busqueda.trim()) return sesiones;
+    
+    const term = busqueda.toLowerCase().trim();
+    return sesiones.filter((s) =>
+      s.organizador?.toLowerCase().includes(term) ||
+      s.code?.toLowerCase().includes(term) ||
+      s.sala?.toLowerCase().includes(term) ||
+      s.titulo?.toLowerCase().includes(term) ||
+      s.detalles?.toLowerCase().includes(term)
+    );
+  }, [sesiones, busqueda]);
+
+  // Verificar si el usuario ya está unido a una sesión
+  const isUserJoined = (sesion) => {
+    if (!user) return false;
+    return sesion.asistentes?.includes(user.username) || 
+           sesion.organizador === user.username;
+  };
 
   return (
     <div className="eventosContainer">
@@ -242,7 +268,10 @@ export default function Eventos() {
                 className="eventosSearchInput"
               />
             </div>
-            {/* Botón 'Crear Evento' eliminado por solicitud del usuario */}
+            {/* Indicador de conexión en tiempo real */}
+            <span className={`eventosConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
+              {conectado ? '🟢 En vivo' : '🔴 Desconectado'}
+            </span>
           </div>
         </div>
       </div>
@@ -262,6 +291,9 @@ export default function Eventos() {
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           <span>{error}</span>
+          <button onClick={recargar} className="eventosRetryButton">
+            Reintentar
+          </button>
         </div>
       )}
 
@@ -287,8 +319,11 @@ export default function Eventos() {
           </div>
         ) : (
           <div className="eventosGrid">
-            {filtradas.map((s, index) =>
-              user?.role === 'admin' ? (
+            {filtradas.map((s, index) => {
+              // Si el usuario ya está unido, no mostrar botón de unirse
+              const yaUnido = isUserJoined(s);
+              
+              return user?.role === 'admin' ? (
                 <TarjetaAdmin
                   key={s.id}
                   sesion={s}
@@ -297,9 +332,14 @@ export default function Eventos() {
                   onEliminar={s.organizador === user.username ? () => handleEliminar(s.id) : null}
                 />
               ) : (
-                <TarjetaUnirse key={s.id} sesion={s} index={index} />
-              )
-            )}
+                <TarjetaUnirse 
+                  key={s.id} 
+                  sesion={s} 
+                  index={index}
+                  onJoinSuccess={handleJoinSuccess}
+                />
+              );
+            })}
           </div>
         )
       )}

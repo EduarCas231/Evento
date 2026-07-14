@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { api } from '../../services/api';
+// pages/Home.jsx
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useSesiones } from '../../context/SesionesContext';
 import { useNotificaciones } from '../../hooks/useNotificaciones';
-import { useSSE } from '../../hooks/useSSE';
 import '../../styles/Home.css';
 
 const etiquetaTipo = (tipo) => (
@@ -126,35 +126,32 @@ function TarjetaEvento({ evento, index }) {
 }
 
 export default function Home() {
-  const [registrados, setRegistrados] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const { user } = useAuth();
+  // 👇 Usamos el contexto en lugar de estado local
+  const { sesiones, loading, error, conectado } = useSesiones();
+  
+  // Filtramos SOLO los eventos donde el usuario está registrado
+  const registrados = useMemo(() => {
+    if (!user || !sesiones.length) return [];
+    
+    // Asumimos que el usuario está registrado si:
+    // 1. Es el organizador, o
+    // 2. Aparece en la lista de asistentes
+    return sesiones.filter(sesion => 
+      sesion.organizador === user.username ||
+      (sesion.asistentes && sesion.asistentes.includes(user.username))
+    );
+  }, [sesiones, user]);
 
+  // Notificaciones solo para eventos registrados
   useNotificaciones(registrados);
-  useSSE(setRegistrados);
 
+  // Mostrar estado de conexión (opcional, para debugging)
   useEffect(() => {
-    const cargar = async () => {
-      try {
-        const data = await api.sesiones.misRegistros();
-        const enriquecidos = await Promise.all(
-          data.map(async (s, index) => {
-            try {
-              const info = await api.sesiones.asistentes(s.id);
-              return { ...s, ocupados: info.ocupados, capacidad: info.capacidad ?? s.capacidad, index };
-            } catch { return { ...s, index }; }
-          })
-        );
-        setRegistrados(enriquecidos);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    cargar();
-  }, []);
+    if (!loading && registrados.length > 0) {
+      console.log(`📊 Home: ${registrados.length} eventos registrados, SSE: ${conectado ? '✅' : '❌'}`);
+    }
+  }, [registrados, conectado, loading]);
 
   return (
     <div className="homeContainer">
@@ -169,6 +166,10 @@ export default function Home() {
           <div className="homeBadge">
             <span className="homeBadgeText">
               {registrados.length} {registrados.length === 1 ? 'Evento' : 'Eventos'}
+            </span>
+            {/* Indicador de conexión en tiempo real */}
+            <span className={`homeConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
+              {conectado ? '🟢' : '🔴'}
             </span>
           </div>
         </div>
@@ -208,8 +209,12 @@ export default function Home() {
           </div>
         ) : (
           <div className="homeGrid">
-            {registrados.map((s) => (
-              <TarjetaEvento key={s.id} evento={s} index={s.index || 0} />
+            {registrados.map((sesion, index) => (
+              <TarjetaEvento 
+                key={sesion.id} 
+                evento={sesion} 
+                index={index} 
+              />
             ))}
           </div>
         )

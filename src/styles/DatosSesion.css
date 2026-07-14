@@ -1,0 +1,605 @@
+/* src/styles/DatosSesion.css */
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.datosSesionContainer {
+  padding: 30px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.datosSesionHeader {
+  margin-bottom: 32px;
+  padding: 24px 32px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.04);
+  animation: slideDown 0.6s ease;
+}
+
+.datosSesionHeaderContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.datosSesionTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.5px;
+}
+
+.datosSesionSubtitle {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.datosSesionLiveIndicator {
+  margin-left: 10px;
+  color: #28a745;
+  font-weight: 600;
+}
+
+.datosSesionBadge {
+  background: linear-gradient(135deg, #406e9b 0%, #355a7a 100%);
+  padding: 8px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(64, 110, 155, 0.3);
+}
+
+.datosSesionBadgeText {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ============================================
+   ETIQUETA DE TIPO
+   ============================================ */
+.datosSesionEtiqueta {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.datosSesionEtiquetaPrivado {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.datosSesionEtiquetaPublico {
+  background-color: rgba(64, 110, 155, 0.15);
+  color: #406e9b;
+  border: 1px solid #406e9b;
+}
+
+/* ============================================
+   LOADING
+   ============================================ */
+.datosSesionLoadingContainer {
+  text-align: center;
+  padding: 60px 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.datosSesionSpinner {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #406e9b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.datosSesionLoadingText {
+  margin-top: 16px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+/* ============================================
+   ERROR
+   ============================================ */
+.datosSesionError {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #dc2626;
+  margin-bottom: 24px;
+  animation: shake 0.5s ease;
+}
+
+.datosSesionErrorIcon {
+  width: 24px;
+  height: 24px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.datosSesionRetryButton {
+  margin-left: 12px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  background: #406e9b;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.datosSesionRetryButton:hover {
+  background: #355a7a;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.datosSesionEmpty {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  animation: fadeIn 0.6s ease;
+}
+
+.datosSesionEmptyIcon {
+  width: 64px;
+  height: 64px;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+
+.datosSesionEmptyIconSmall {
+  width: 24px;
+  height: 24px;
+  color: #9ca3af;
+}
+
+.datosSesionEmptyTitle {
+  font-size: 20px;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.datosSesionEmptyText {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.datosSesionEmptyButton {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #406e9b 0%, #355a7a 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(64, 110, 155, 0.3);
+}
+
+.datosSesionEmptyButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(64, 110, 155, 0.4);
+}
+
+/* ============================================
+   PANELS CONTAINER
+   ============================================ */
+.datosSesionPanelsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ============================================
+   PANEL DE EVENTO
+   ============================================ */
+.datosSesionPanel {
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  animation: slideUp 0.6s ease both;
+}
+
+.datosSesionPanelHovered {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(64, 110, 155, 0.2), 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.datosSesionPanelHeader {
+  padding: 16px 24px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.datosSesionPanelHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.datosSesionPanelCode {
+  background: #e2e8f0;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  color: #475569;
+}
+
+.datosSesionPanelActions {
+  display: flex;
+  gap: 8px;
+}
+
+.datosSesionPanelBody {
+  padding: 24px;
+}
+
+.datosSesionPanelTitle {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.datosSesionPanelDescription {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   INFO GRID
+   ============================================ */
+.datosSesionInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  padding: 12px;
+  background-color: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.datosSesionInfoItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.datosSesionInfoIcon {
+  width: 20px;
+  text-align: center;
+}
+
+/* ============================================
+   BARRA DE ASISTENCIA
+   ============================================ */
+.datosSesionBarraContainer {
+  margin-bottom: 20px;
+}
+
+.datosSesionBarraHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #475569;
+}
+
+.datosSesionBarraDisponibles {
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.datosSesionBarraDisponible {
+  color: #28a745;
+}
+
+.datosSesionBarraLleno {
+  color: #dc3545;
+}
+
+.datosSesionBarraBackground {
+  background-color: #e2e8f0;
+  border-radius: 6px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.datosSesionBarraFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   LOADING ASISTENCIA
+   ============================================ */
+.datosSesionLoadingAsistencia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.datosSesionSmallSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #406e9b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   PARTICIPANTES
+   ============================================ */
+.datosSesionParticipantesContainer {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.datosSesionParticipantesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.datosSesionParticipantesTitle {
+  margin: 0;
+  color: #1a1a2e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.datosSesionParticipantesCount {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.datosSesionParticipantesLoading {
+  font-size: 13px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.datosSesionParticipantesEmpty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ============================================
+   TABLA DE PARTICIPANTES
+   ============================================ */
+.datosSesionTableWrapper {
+  overflow-x: auto;
+}
+
+.datosSesionTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.datosSesionTableHeader {
+  background-color: #f8fafc;
+}
+
+.datosSesionTableRow {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease;
+  animation: fadeIn 0.3s ease both;
+}
+
+.datosSesionTableRow:hover {
+  background-color: #f8fafc;
+}
+
+.datosSesionTableCell {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.datosSesionTableCellRight {
+  text-align: right;
+}
+
+.datosSesionTableCellEmail {
+  color: #6b7280;
+}
+
+.datosSesionTableCellFecha {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* ============================================
+   BOTONES DE ACCIÓN
+   ============================================ */
+.datosSesionEditButton {
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.datosSesionEditButton:hover {
+  transform: translateY(-2px);
+}
+
+.datosSesionDeleteButton {
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.datosSesionDeleteButton:hover {
+  transform: translateY(-2px);
+}
+
+.datosSesionRemoveButton {
+  padding: 4px 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.datosSesionRemoveButton:hover {
+  background-color: #dc2626;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .datosSesionContainer {
+    padding: 16px;
+  }
+  
+  .datosSesionHeader {
+    padding: 16px 20px;
+  }
+  
+  .datosSesionTitle {
+    font-size: 22px;
+  }
+  
+  .datosSesionHeaderContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .datosSesionInfoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .datosSesionTitle {
+    font-size: 18px;
+  }
+  
+  .datosSesionBadge {
+    padding: 6px 14px;
+  }
+  
+  .datosSesionBadgeText {
+    font-size: 12px;
+  }
+  
+  .datosSesionPanelHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .datosSesionPanelActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
