@@ -8,6 +8,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isAuthenticated = Boolean(user);
 
   const isActive = (path) => pathname === path;
   const linkClass = (path) => `navLink${isActive(path) ? ' navLinkActive' : ''}`;
@@ -16,7 +17,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbarContainer">
         {/* Logo y marca */}
-        <div className="brand" onClick={() => navigate('/home')}>
+        <div className="brand" onClick={() => navigate(isAuthenticated ? '/home' : '/login')}>
           <div className="logoContainer">
             <svg className="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
@@ -51,68 +52,80 @@ export default function Navbar() {
 
         {/* Menú de navegación */}
         <div className={`navLinks${isMobileMenuOpen ? ' navLinksOpen' : ''}`}>
-          <button
-            className={linkClass('/home')}
-            onClick={() => {
-              navigate('/home');
-              setIsMobileMenuOpen(false);
-            }}
-          >
-            <span className="linkIcon">🏠</span>
-            Inicio
-            {isActive('/home') && <span className="activeDot"></span>}
-          </button>
+          {isAuthenticated ? (
+            <>
+              <button
+                className={linkClass('/home')}
+                onClick={() => {
+                  navigate('/home');
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <span className="linkIcon">🏠</span>
+                Inicio
+                {isActive('/home') && <span className="activeDot"></span>}
+              </button>
 
-          <button
-            className={linkClass('/eventos')}
-            onClick={() => {
-              navigate('/eventos');
-              setIsMobileMenuOpen(false);
-            }}
-          >
-            <span className="linkIcon">📅</span>
-            Eventos
-            {isActive('/eventos') && <span className="activeDot"></span>}
-          </button>
+              <button
+                className={linkClass('/eventos')}
+                onClick={() => {
+                  navigate('/eventos');
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <span className="linkIcon">📅</span>
+                Eventos
+                {isActive('/eventos') && <span className="activeDot"></span>}
+              </button>
 
-          {user?.role === 'admin' && (
-            <button
-              className={linkClass('/sesiones')}
-              onClick={() => {
-                navigate('/sesiones');
-                setIsMobileMenuOpen(false);
-              }}
-            >
-              <span className="linkIcon">📊</span>
-              Datos de Eventos
-              {isActive('/sesiones') && <span className="activeDot"></span>}
-            </button>
+            
+              )}
+
+              {user?.role === 'admin' && (
+                <button
+                  className={linkClass('/datos-sesion')}
+                  onClick={() => {
+                    navigate('/datos-sesion');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <span className="linkIcon">📈</span>
+                  Mis Sesiones
+                  {isActive('/datos-sesion') && <span className="activeDot"></span>}
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+            </>
           )}
         </div>
 
         {/* Sección de usuario */}
-        <div className="userSection">
-          <div className="userInfo">
-            <div className="userAvatar">
-              {user?.username?.charAt(0).toUpperCase() || 'U'}
+        {isAuthenticated && (
+          <div className="userSection">
+            <div className="userInfo">
+              <div className="userAvatar">
+                {user?.username?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <div className="userDetails">
+                <span className="userName">{user?.username || 'Usuario'}</span>
+                <span className="userRole">
+                  {user?.role === 'admin' ? 'Administrador' : 'Usuario'}
+                </span>
+              </div>
             </div>
-            <div className="userDetails">
-              <span className="userName">{user?.username || 'Usuario'}</span>
-              <span className="userRole">
-                {user?.role === 'admin' ? 'Administrador' : 'Usuario'}
-              </span>
-            </div>
-          </div>
 
-          <button className="logoutButton" onClick={logout}>
-            <svg className="logoutIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            Cerrar Sesión
-          </button>
-        </div>
+            <button className="logoutButton" onClick={logout}>
+              <svg className="logoutIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Cerrar Sesión
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );
