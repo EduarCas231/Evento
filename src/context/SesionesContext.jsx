@@ -12,20 +12,22 @@ export function SesionesProvider({ children }) {
   const [error, setError] = useState('');
   const [conectado, setConectado] = useState(false);
   const esRef = useRef(null);
-  const { user, token } = useAuth(); // ajusta según lo que exponga tu AuthContext
+  const { user, token } = useAuth();
 
-  // Carga inicial de todas las sesiones (una sola vez, al montar el Provider)
   const cargarSesiones = useCallback(() => {
     setLoading(true);
     api.sesiones.listar()
       .then((data) => {
         setSesiones(data);
-        // Carga el conteo de asistentes de cada una, en paralelo
         data.forEach((s) => {
           api.sesiones.asistentes(s.id)
             .then((d) => {
               setSesiones((prev) =>
-                prev.map((x) => x.id === s.id ? { ...x, ocupados: d.ocupados ?? 0 } : x)
+                prev.map((x) =>
+                  x.id === s.id
+                    ? { ...x, ocupados: d.ocupados ?? 0, asistentes: d.asistentes ?? [] }
+                    : x
+                )
               );
             })
             .catch(() => {});
@@ -39,7 +41,6 @@ export function SesionesProvider({ children }) {
     if (user) cargarSesiones();
   }, [user, cargarSesiones]);
 
-  // Conexión SSE única para toda la app
   useEffect(() => {
     if (!token) return;
 
@@ -47,7 +48,14 @@ export function SesionesProvider({ children }) {
     const es = new EventSource(url);
     esRef.current = es;
 
-    es.onopen = () => setConectado(true);
+    let esPrimeraConexion = true;
+    es.onopen = () => {
+      setConectado(true);
+      if (!esPrimeraConexion) {
+        cargarSesiones();
+      }
+      esPrimeraConexion = false;
+    };
 
     es.addEventListener('sesion_actualizada', (e) => {
       const datos = JSON.parse(e.data);
@@ -55,7 +63,7 @@ export function SesionesProvider({ children }) {
         const existe = prev.some(s => s.id === datos.id);
         return existe
           ? prev.map(s => s.id === datos.id ? { ...s, ...datos } : s)
-          : [...prev, datos]; // por si es una sesión nueva que este usuario aún no tenía
+          : [...prev, datos];
       });
     });
 
@@ -69,6 +77,14 @@ export function SesionesProvider({ children }) {
       setSesiones(prev =>
         prev.map(s => s.id === id_sesion ? { ...s, ocupados, capacidad } : s)
       );
+
+      api.sesiones.asistentes(id_sesion)
+        .then((d) => {
+          setSesiones(prev =>
+            prev.map(s => s.id === id_sesion ? { ...s, asistentes: d.asistentes ?? [] } : s)
+          );
+        })
+        .catch(() => {});
     });
 
     es.onerror = (event) => {
@@ -80,7 +96,7 @@ export function SesionesProvider({ children }) {
       es.close();
       setConectado(false);
     };
-  }, [token]);
+  }, [token, cargarSesiones]);
 
   const value = {
     sesiones,

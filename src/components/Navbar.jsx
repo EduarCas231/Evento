@@ -78,9 +78,6 @@ export default function Navbar() {
                 {isActive('/eventos') && <span className="activeDot"></span>}
               </button>
 
-            
-              )}
-
               {user?.role === 'admin' && (
                 <button
                   className={linkClass('/datos-sesion')}
@@ -95,10 +92,7 @@ export default function Navbar() {
                 </button>
               )}
             </>
-          ) : (
-            <>
-            </>
-          )}
+          ) : null}
         </div>
 
         {/* Sección de usuario */}

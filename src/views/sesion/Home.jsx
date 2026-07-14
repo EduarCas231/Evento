@@ -137,9 +137,12 @@ export default function Home() {
     // Asumimos que el usuario está registrado si:
     // 1. Es el organizador, o
     // 2. Aparece en la lista de asistentes
+    // 👇 FIX: sesion.asistentes es un arreglo de OBJETOS ({id, nombre, username, email, ...}),
+    // no de strings — .includes(user.username) comparaba un string contra objetos
+    // y nunca daba true, por eso nunca aparecía la sesión recién unida.
     return sesiones.filter(sesion => 
       sesion.organizador === user.username ||
-      (sesion.asistentes && sesion.asistentes.includes(user.username))
+      (sesion.asistentes && sesion.asistentes.some(a => a.username === user.username))
     );
   }, [sesiones, user]);
 

@@ -12,12 +12,14 @@ const etiquetaTipo = (tipo) => (
   </span>
 );
 
-function TarjetaUnirse({ sesion, index, onJoinSuccess }) {
+function TarjetaUnirse({ sesion, index, onJoinSuccess, yaUnido }) {
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState({ texto: '', tipo: '' });
   const [loading, setLoading] = useState(false);
   const [unido, setUnido] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  const mostrarComoUnido = unido || yaUnido;
 
   const handleUnirse = async () => {
     setLoading(true);
@@ -26,8 +28,7 @@ function TarjetaUnirse({ sesion, index, onJoinSuccess }) {
       const data = await api.sesiones.unirse(sesion.code, sesion.tipo === 'privado' ? password : undefined);
       setMsg({ texto: data.message || '¡Te uniste al evento!', tipo: 'ok' });
       setUnido(true);
-      
-      // Notificar al contexto que hubo un cambio
+
       if (onJoinSuccess) {
         onJoinSuccess(sesion.id);
       }
@@ -84,7 +85,11 @@ function TarjetaUnirse({ sesion, index, onJoinSuccess }) {
         </div>
       )}
 
-      {!unido && (
+      {mostrarComoUnido ? (
+        <div className="eventosMessage eventosMessageOk">
+          ✅ Ya estás registrado en este evento
+        </div>
+      ) : (
         sesion.tipo === 'privado' ? (
           <div className="eventosPrivateJoin">
             <input
@@ -194,39 +199,37 @@ function TarjetaAdmin({ sesion, onEditar, onEliminar, index }) {
 export default function Eventos() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
-  // 👇 Usamos el contexto en lugar de estado local
+
   const { sesiones, loading, error, conectado, setSesiones, recargar } = useSesiones();
-  
+
   const [busqueda, setBusqueda] = useState('');
   const [joiningId, setJoiningId] = useState(null);
 
-  // Función para manejar el éxito al unirse
   const handleJoinSuccess = (id) => {
     setJoiningId(id);
-    // Recargar datos para actualizar la lista de asistentes
     recargar();
-    // Después de un momento, limpiar el estado
-    setTimeout(() => setJoiningId(null), 3000);
+
+    setTimeout(() => {
+      setJoiningId(null);
+      navigate('/home');
+    }, 1200);
   };
 
   const handleEliminar = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este evento?')) return;
     try {
       await api.sesiones.eliminar(id);
-      // Actualizar el contexto eliminando la sesión
       setSesiones((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       alert(err.message);
     }
   };
 
-  // Filtrar sesiones según búsqueda
   const filtradas = useMemo(() => {
     if (!sesiones.length) return [];
-    
+
     if (!busqueda.trim()) return sesiones;
-    
+
     const term = busqueda.toLowerCase().trim();
     return sesiones.filter((s) =>
       s.organizador?.toLowerCase().includes(term) ||
@@ -237,10 +240,9 @@ export default function Eventos() {
     );
   }, [sesiones, busqueda]);
 
-  // Verificar si el usuario ya está unido a una sesión
   const isUserJoined = (sesion) => {
     if (!user) return false;
-    return sesion.asistentes?.includes(user.username) || 
+    return sesion.asistentes?.some(a => a.username === user.username) ||
            sesion.organizador === user.username;
   };
 
@@ -268,7 +270,6 @@ export default function Eventos() {
                 className="eventosSearchInput"
               />
             </div>
-            {/* Indicador de conexión en tiempo real */}
             <span className={`eventosConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
               {conectado ? '🟢 En vivo' : '🔴 Desconectado'}
             </span>
@@ -320,23 +321,23 @@ export default function Eventos() {
         ) : (
           <div className="eventosGrid">
             {filtradas.map((s, index) => {
-              // Si el usuario ya está unido, no mostrar botón de unirse
-              const yaUnido = isUserJoined(s);
-              
-              return user?.role === 'admin' ? (
+              const esOrganizador = s.organizador === user?.username;
+
+              return esOrganizador ? (
                 <TarjetaAdmin
                   key={s.id}
                   sesion={s}
                   index={index}
-                  onEditar={s.organizador === user.username ? () => navigate(`/sesiones/editar/${s.id}`) : null}
-                  onEliminar={s.organizador === user.username ? () => handleEliminar(s.id) : null}
+                  onEditar={() => navigate(`/sesiones/editar/${s.id}`)}
+                  onEliminar={() => handleEliminar(s.id)}
                 />
               ) : (
-                <TarjetaUnirse 
-                  key={s.id} 
-                  sesion={s} 
+                <TarjetaUnirse
+                  key={s.id}
+                  sesion={s}
                   index={index}
                   onJoinSuccess={handleJoinSuccess}
+                  yaUnido={isUserJoined(s)}
                 />
               );
             })}

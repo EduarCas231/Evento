@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/SesionForm.css';
 
 const EMPTY = { 
@@ -22,28 +23,36 @@ export default function SesionForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [sinPermiso, setSinPermiso] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const esEdicion = Boolean(id);
 
   useEffect(() => {
     if (!esEdicion) return;
     api.sesiones.obtener(id)
-      .then((data) => setForm({
-        titulo: data.titulo || '',
-        sala: data.sala || '',
-        code: data.code || '',
-        capacidad: data.capacidad || '',
-        detalles: data.detalles || '',
-        fecha: data.fecha || '',
-        hora_inicio: data.hora_inicio || '',
-        hora_fin: data.hora_fin || '',
-        zona: data.zona || '',
-        tipo: data.tipo || 'publico',
-        password: data.password || '',
-      }))
+      .then((data) => {
+        if (data.organizador !== user?.username) {
+          setSinPermiso(true);
+          return;
+        }
+        setForm({
+          titulo: data.titulo || '',
+          sala: data.sala || '',
+          code: data.code || '',
+          capacidad: data.capacidad || '',
+          detalles: data.detalles || '',
+          fecha: data.fecha || '',
+          hora_inicio: data.hora_inicio || '',
+          hora_fin: data.hora_fin || '',
+          zona: data.zona || '',
+          tipo: data.tipo || 'publico',
+          password: data.password || '',
+        });
+      })
       .catch((err) => setError(err.message));
-  }, [id, esEdicion]);
+  }, [id, esEdicion, user]);
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -61,7 +70,7 @@ export default function SesionForm() {
         setSuccess('¡Sesión creada con éxito!');
       }
       setTimeout(() => {
-        navigate('/sesiones');
+        navigate('/datos-sesion');
       }, 1500);
     } catch (err) {
       setError(err.message);
@@ -84,6 +93,31 @@ export default function SesionForm() {
       />
     </div>
   );
+
+  if (sinPermiso) {
+    return (
+      <div className="formContainer">
+        <div className="formCard">
+          <div className="formError">
+            <svg className="formErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span className="formErrorText">No tienes permiso para editar este evento — solo el organizador puede hacerlo.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/datos-sesion')}
+            className="formCancelButton"
+            style={{ marginTop: '1rem' }}
+          >
+            Volver
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="formContainer">
@@ -220,7 +254,7 @@ export default function SesionForm() {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/sesiones')}
+              onClick={() => navigate('/datos-sesion')}
               className="formCancelButton"
               disabled={loading}
             >

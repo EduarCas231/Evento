@@ -63,11 +63,14 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, index }) => {
       .then(setDatos)
       .catch(() => setDatos({ ocupados: 0, capacidad: evento.capacidad, asistentes: [] }))
       .finally(() => setLoading(false));
-  }, [evento.id, evento.capacidad]);
+  }, [evento.id]);
 
-  React.useEffect(() => { 
-    cargarAsistentes(); 
-  }, [cargarAsistentes]);
+  // 👇 FIX: ahora también se dispara cuando el Context actualiza evento.ocupados vía SSE
+  // (antes solo dependía de evento.id/evento.capacidad, que casi nunca cambian,
+  // por eso la tabla de participantes se quedaba congelada hasta refrescar)
+  React.useEffect(() => {
+    cargarAsistentes();
+  }, [evento.id, evento.ocupados, cargarAsistentes]);
 
   const handleEliminarAsistente = async (idAsistencia, nombre) => {
     if (!window.confirm(`¿Eliminar a ${nombre} del evento?`)) return;
