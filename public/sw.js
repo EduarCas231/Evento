@@ -3,8 +3,8 @@ self.addEventListener('push', e => {
   e.waitUntil(
     self.registration.showNotification(data.titulo, {
       body: data.mensaje,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
+      icon: '/logo192.png',
+      badge: '/logo192.png',
       data: { url: data.url || '/' }
     })
   );

@@ -303,6 +303,16 @@
   cursor: not-allowed;
 }
 
+.datosSesionResumenButton {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.datosSesionResumenButton:hover {
+  background: #ddd6fe;
+  transform: translateY(-1px);
+}
+
 .datosSesionEditButton {
   background: var(--color-gray-100);
   color: var(--color-gray-700);

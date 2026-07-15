@@ -1,0 +1,285 @@
+.resumenContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.resumenLoadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 16px;
+  color: #6b7280;
+}
+
+.resumenSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: resumenSpin 0.8s linear infinite;
+}
+
+@keyframes resumenSpin {
+  to { transform: rotate(360deg); }
+}
+
+.resumenHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.resumenVolverButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.resumenVolverButton:hover {
+  background-color: #e5e7eb;
+}
+
+.resumenVolverIcon {
+  font-size: 14px;
+}
+
+.resumenEstadoBadge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: #e5e7eb;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.resumenTitulo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.resumenMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.resumenMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.resumenMetaIcon {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.resumenStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.resumenStatCard {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.resumenStatIcon {
+  font-size: 20px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.resumenStatCardOk .resumenStatIcon { color: #16a34a; }
+.resumenStatCardWarn .resumenStatIcon { color: #dc2626; }
+.resumenStatCardAccent .resumenStatIcon { color: #4f46e5; }
+
+.resumenStatValor {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.resumenStatLabel {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.resumenHoraPico {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #eef2ff;
+  color: #3730a3;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.resumenHoraPicoIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.resumenSeccion {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.resumenSeccionTitulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+.resumenSeccionIcon {
+  font-size: 18px;
+  color: #4f46e5;
+}
+
+.resumenGraficaVacia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+}
+
+.resumenGraficaVaciaIcon {
+  font-size: 28px;
+}
+
+.resumenGrafica {
+  width: 100%;
+}
+
+.resumenGraficaSvg {
+  width: 100%;
+  height: 180px;
+}
+
+.resumenGraficaBarra {
+  fill: #4f46e5;
+}
+
+.resumenGraficaValor {
+  font-size: 3px;
+  fill: #374151;
+  font-weight: 700;
+}
+
+.resumenGraficaEje {
+  stroke: #e5e7eb;
+  stroke-width: 0.3;
+}
+
+.resumenGraficaEtiquetas {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 6px;
+}
+
+.resumenGraficaEtiqueta {
+  font-size: 11px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.resumenListaVacia {
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+
+.resumenTableWrapper {
+  overflow-x: auto;
+}
+
+.resumenTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.resumenTable th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #e5e7eb;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+.resumenTable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+
+.resumenTableEmailIcon {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.resumenError {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.resumenErrorIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}

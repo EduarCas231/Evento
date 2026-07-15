@@ -1,8 +1,7 @@
 // pages/Home.jsx
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSesiones } from '../../context/SesionesContext';
-import { useNotificaciones } from '../../hooks/useNotificaciones';
 import '../../styles/Home.css';
 
 // Importar íconos (usando React Icons o SVG inline)
@@ -79,24 +78,9 @@ function TarjetaEvento({ evento, index }) {
   const estadoInfo = obtenerEstadoInfo(evento.estado);
   const [countdown, setCountdown] = useState(() => calcularTemporizador(evento));
   const [isHovered, setIsHovered] = useState(false);
-  const notif5Ref = useRef(false);
-  const cardRef = useRef(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const inicio = new Date(`${evento.fecha}T${evento.hora_inicio}`);
-      const diff = inicio - Date.now();
-
-      if (evento.estado === 'pendiente' && diff > 240000 && diff <= 300000 && !notif5Ref.current) {
-        if (Notification.permission === 'granted') {
-          new Notification(` Empieza en 5 min — ${evento.titulo}`, {
-            body: `Inicia a las ${evento.hora_inicio} en ${evento.sala || 'su sala'}.`,
-            icon: '/favicon.ico',
-          });
-        }
-        notif5Ref.current = true;
-      }
-
       setCountdown(calcularTemporizador(evento));
     }, 1000);
     return () => clearInterval(timer);
@@ -112,7 +96,6 @@ function TarjetaEvento({ evento, index }) {
 
   return (
     <div
-      ref={cardRef}
       className={`homeCard ${isHovered ? 'homeCardHovered' : ''}`}
       style={{
         animation: `slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
@@ -230,11 +213,9 @@ export default function Home() {
     );
   }, [sesiones, user]);
 
-  useNotificaciones(registrados);
-
   useEffect(() => {
     if (!loading && registrados.length > 0) {
-      console.log(`📊 Home: ${registrados.length} eventos registrados, SSE: ${conectado ? '✅' : '❌'}`);
+      console.log(`Home: ${registrados.length} eventos registrados, SSE: ${conectado ? 'conectado' : 'desconectado'}`);
     }
   }, [registrados, conectado, loading]);
 

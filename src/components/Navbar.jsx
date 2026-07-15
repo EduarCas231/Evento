@@ -51,7 +51,7 @@ export default function Navbar() {
   if (user?.role === 'admin') {
     navItems.push({ 
       path: '/datos-sesion', 
-      label: 'Mis Sesiones', 
+      label: 'Mis Eventos', 
       icon: FiBarChart2, 
       activeIcon: MdAnalytics 
     });

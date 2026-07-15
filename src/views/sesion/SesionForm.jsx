@@ -229,7 +229,7 @@ export default function SesionForm() {
             </div>
             <div className="formGrid">
               {campo('Sala', 'sala', 'text', 'Ej. Auditorio A', <MdLocationOn />)}
-              {campo('Ubicación', 'ubicacion', 'text', 'Ej. Zona Norte', <FiMapPin />)}
+              {campo('Ubicación', 'zona', 'text', 'Ej. Zona Norte', <FiMapPin />)}
             </div>
           </div>
 

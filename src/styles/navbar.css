@@ -439,8 +439,37 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  .navbarContainer {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
   .brandTextContainer {
     display: none;
+  }
+
+  .mobileMenuButton {
+    order: 1;
+    margin-right: 8px;
+  }
+
+  .themeToggleWrapper {
+    order: 2;
+    margin-left: 0;
+  }
+
+  .brand {
+    order: 3;
+    margin-left: auto;
+  }
+
+  .navLinks {
+    order: 4;
+    width: 100%;
+  }
+
+  .userSection {
+    order: 5;
   }
 }
 
@@ -451,6 +480,7 @@
 
   .mobileOverlay {
     display: block;
+    z-index: 1000;
   }
 
   .mobileMenuButton {
@@ -476,12 +506,15 @@
     visibility: hidden;
     max-height: calc(100vh - 60px);
     overflow-y: auto;
+    z-index: 1002;
+    pointer-events: auto;
   }
 
   .navLinksOpen {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
+    z-index: 1002;
   }
 
   .navLinksList {

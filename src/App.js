@@ -11,6 +11,7 @@ import Eventos from './views/sesion/Eventos';
 import DatosSesion from './views/sesion/DatosSesion';
 import SesionForm from './views/sesion/SesionForm';
 import EscanearQR from './views/sesion/EscanearQR';
+import ResumenEvento from './views/sesion/ResumenEvento';
 import NotFound from './views/nofoud404';
 
 function App() {
@@ -54,11 +55,13 @@ function AppContent() {
         <Route path="/sesiones/nueva" element={<ProtectedRoute><SesionForm /></ProtectedRoute>} />
         <Route path="/sesiones/editar/:id" element={<ProtectedRoute><SesionForm /></ProtectedRoute>} />
         <Route path="/sesiones/escanear/:id" element={<ProtectedRoute><EscanearQR /></ProtectedRoute>} />
+        <Route path="/sesiones/resumen/:id" element={<ProtectedRoute><ResumenEvento /></ProtectedRoute>} />
         <Route path="/404" element={<NotFound />} />
 
         {/* Redirección automática */}
-        <Route path="/" element={<Navigate to="/404" />} />
-        <Route path="*" element={<Navigate to="/404" />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/login
+        " />} />
       </Routes>
     </>
   );

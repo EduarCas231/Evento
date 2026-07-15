@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { api } from '../../services/api';
+import { FiCamera, FiArrowLeft, FiPause, FiPlay, FiCheckCircle, FiAlertTriangle, FiXCircle } from 'react-icons/fi';
 import '../../styles/EscanearQR.css';
 
 export default function EscanearQR() {
@@ -83,9 +84,13 @@ export default function EscanearQR() {
   return (
     <div className="escanearContainer">
       <div className="escanearHeader">
-        <h1 className="escanearTitle">📷 Escanear entradas</h1>
+        <h1 className="escanearTitle">
+          <FiCamera className="escanearTitleIcon" />
+          Escanear entradas
+        </h1>
         <button onClick={() => navigate('/datos-sesion')} className="escanearVolverButton">
-          ← Volver
+          <FiArrowLeft className="escanearVolverIcon" />
+          Volver
         </button>
       </div>
 
@@ -111,7 +116,17 @@ export default function EscanearQR() {
           onClick={() => setEscaneando((prev) => !prev)}
           className="escanearPausarButton"
         >
-          {escaneando ? '⏸️ Pausar cámara' : '▶️ Reanudar cámara'}
+          {escaneando ? (
+            <>
+              <FiPause className="escanearPausarIcon" />
+              Pausar cámara
+            </>
+          ) : (
+            <>
+              <FiPlay className="escanearPausarIcon" />
+              Reanudar cámara
+            </>
+          )}
         </button>
       </div>
 
@@ -124,7 +139,13 @@ export default function EscanearQR() {
             {historial.map((item) => (
               <li key={item.id} className={`escanearHistorialItem escanearHistorialItem--${item.tipo}`}>
                 <span className="escanearHistorialIcono">
-                  {item.tipo === 'ok' ? '✅' : item.tipo === 'repetido' ? '⚠️' : '❌'}
+                  {item.tipo === 'ok' ? (
+                    <FiCheckCircle />
+                  ) : item.tipo === 'repetido' ? (
+                    <FiAlertTriangle />
+                  ) : (
+                    <FiXCircle />
+                  )}
                 </span>
                 <div className="escanearHistorialTexto">
                   <strong>{item.nombre}</strong>

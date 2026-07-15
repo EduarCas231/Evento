@@ -15,6 +15,13 @@
   font-size: 24px;
   font-weight: 700;
   color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.escanearTitleIcon {
+  font-size: 22px;
 }
 
 .escanearVolverButton {
@@ -26,6 +33,13 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.escanearVolverIcon {
+  font-size: 14px;
 }
 
 .escanearVolverButton:hover {
@@ -67,6 +81,13 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.escanearPausarIcon {
+  font-size: 14px;
 }
 
 .escanearHistorial {

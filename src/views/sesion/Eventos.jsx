@@ -10,7 +10,7 @@ import {
   FiCheckCircle, FiAlertCircle, FiRefreshCw, FiBookOpen,
   FiKey, FiLogIn, FiAward, FiPlus
 } from 'react-icons/fi';
-import { MdLocationOn, MdAccessTime, MdDateRange, MdPeople } from 'react-icons/md';
+import { MdLocationOn, MdAccessTime, MdDateRange, MdPeople, MdOutlineQrCode2 } from 'react-icons/md';
 import '../../styles/Eventos.css';
 
 const etiquetaTipo = (tipo) => (
@@ -21,6 +21,7 @@ const etiquetaTipo = (tipo) => (
 );
 
 function TarjetaUnirse({ sesion, index, onJoinSuccess, yaUnido }) {
+  const { token } = useAuth();
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState({ texto: '', tipo: '' });
   const [loading, setLoading] = useState(false);
@@ -100,9 +101,23 @@ function TarjetaUnirse({ sesion, index, onJoinSuccess, yaUnido }) {
       )}
 
       {mostrarComoUnido ? (
-        <div className="eventosMessage eventosMessageOk">
-          <FiCheckCircle className="eventosMessageIcon" />
-          <span>Ya estás registrado en este evento</span>
+        <div className="eventosPaseContainer">
+          <div className="eventosMessage eventosMessageOk">
+            <FiCheckCircle className="eventosMessageIcon" />
+            <span>Ya estás registrado en este evento</span>
+          </div>
+          <div className="eventosPaseQr">
+            <div className="eventosPaseQrLabel">
+              <MdOutlineQrCode2 className="eventosPaseQrLabelIcon" />
+              Tu pase de entrada
+            </div>
+            <img
+              src={api.qr.miPaseUrl(sesion.id, token)}
+              alt="Código QR de tu pase de entrada"
+              className="eventosPaseQrImagen"
+            />
+            <p className="eventosPaseQrHint">Muestra este código en la entrada del evento.</p>
+          </div>
         </div>
       ) : (
         sesion.tipo === 'privado' ? (
@@ -416,15 +431,7 @@ export default function Eventos() {
                 ? 'Crea tu primer evento para comenzar'
                 : 'Vuelve más tarde para ver nuevos eventos'}
             </p>
-            {user?.role === 'admin' && !busqueda && (
-              <button 
-                className="eventosCreateButton"
-                onClick={() => navigate('/sesiones/crear')}
-              >
-                <FiPlus className="eventosCreateIcon" />
-                Crear Evento
-              </button>
-            )}
+            
           </div>
         ) : (
           <div className="eventosGrid">

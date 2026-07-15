@@ -190,6 +190,15 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinaliza
               Finalizar
             </button>
           )}
+          {evento.estado === 'finalizado' && (
+            <button
+              onClick={() => navigate(`/sesiones/resumen/${evento.id}`)}
+              className="datosSesionResumenButton"
+            >
+              <FiActivity className="datosSesionActionIcon" />
+              Resumen
+            </button>
+          )}
           <button
             onClick={() => navigate(`/sesiones/escanear/${evento.id}`)}
             className={`datosSesionScanButton ${evento.estado !== 'en_curso' ? 'disabled' : ''}`}
