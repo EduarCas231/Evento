@@ -60,8 +60,7 @@ function AppContent() {
 
         {/* Redirección automática */}
         <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="*" element={<Navigate to="/login
-        " />} />
+        <Route path="*" element={<Navigate to="/404" />} />
       </Routes>
     </>
   );

@@ -400,10 +400,16 @@ export default function DatosEvento() {
             </h1>
             <p className="datosSesionSubtitle">
               {misEventos.length} evento{misEventos.length !== 1 ? 's' : ''} creado{misEventos.length !== 1 ? 's' : ''}
-              {conectado && <span className="datosSesionLiveIndicator">● En vivo</span>}
             </p>
           </div>
           <div className="datosSesionHeaderRight">
+            <button
+              onClick={() => navigate('/sesiones/nueva')}
+              className="datosSesionCreateButton"
+            >
+              <FiPlus className="datosSesionCreateIcon" />
+              Crear Evento
+            </button>
             <div className="datosSesionStats">
               <div className="datosSesionStatItem">
                 <span className="datosSesionStatNumber">{stats.pendientes}</span>
@@ -424,12 +430,6 @@ export default function DatosEvento() {
                 <span className="datosSesionStatNumber capacity">{capacidadTotal}</span>
                 <span className="datosSesionStatLabel">Capacidad</span>
               </div>
-            </div>
-            <div className="datosSesionConnectionStatus">
-              <span className="datosSesionConnectionDot"></span>
-              <span className="datosSesionConnectionText">
-                {conectado ? 'En vivo' : 'Sin conexión'}
-              </span>
             </div>
           </div>
         </div>

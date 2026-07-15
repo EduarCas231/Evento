@@ -8,30 +8,28 @@ const SesionesContext = createContext(null);
 
 export function SesionesProvider({ children }) {
   const [sesiones, setSesiones] = useState([]);
+  const [misUnionesIds, setMisUnionesIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [conectado, setConectado] = useState(false);
   const esRef = useRef(null);
   const { user, token } = useAuth();
 
+  // 👇 antes esto hacía 1 petición por CADA sesión que existiera
+  // (api.sesiones.asistentes(s.id) por cada una) solo para sacar "ocupados" y
+  // saber si el usuario ya estaba unido — con muchos eventos esto se vuelve
+  // muy lento. Ahora son solo 2 peticiones totales, sin importar cuántos
+  // eventos haya: la lista (que ya trae "ocupados" incluido desde el backend)
+  // y los IDs de a qué eventos está unido el usuario actual.
   const cargarSesiones = useCallback(() => {
     setLoading(true);
-    api.sesiones.listar()
-      .then((data) => {
-        setSesiones(data);
-        data.forEach((s) => {
-          api.sesiones.asistentes(s.id)
-            .then((d) => {
-              setSesiones((prev) =>
-                prev.map((x) =>
-                  x.id === s.id
-                    ? { ...x, ocupados: d.ocupados ?? 0, asistentes: d.asistentes ?? [] }
-                    : x
-                )
-              );
-            })
-            .catch(() => {});
-        });
+    Promise.all([
+      api.sesiones.listar(),
+      api.sesiones.misUniones().catch(() => ({ ids_sesiones: [] })),
+    ])
+      .then(([listaSesiones, uniones]) => {
+        setSesiones(listaSesiones);
+        setMisUnionesIds(new Set(uniones.ids_sesiones || []));
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -72,19 +70,13 @@ export function SesionesProvider({ children }) {
       setSesiones(prev => prev.filter(s => s.id !== id));
     });
 
+    // 👇 ya no hace falta un fetch de seguimiento: "ocupados" y "capacidad"
+    // ya vienen directo en el propio evento SSE
     es.addEventListener('asistentes_actualizado', (e) => {
       const { id_sesion, ocupados, capacidad } = JSON.parse(e.data);
       setSesiones(prev =>
         prev.map(s => s.id === id_sesion ? { ...s, ocupados, capacidad } : s)
       );
-
-      api.sesiones.asistentes(id_sesion)
-        .then((d) => {
-          setSesiones(prev =>
-            prev.map(s => s.id === id_sesion ? { ...s, asistentes: d.asistentes ?? [] } : s)
-          );
-        })
-        .catch(() => {});
     });
 
     es.onerror = (event) => {
@@ -101,6 +93,7 @@ export function SesionesProvider({ children }) {
   const value = {
     sesiones,
     setSesiones,
+    misUnionesIds,
     loading,
     error,
     conectado,

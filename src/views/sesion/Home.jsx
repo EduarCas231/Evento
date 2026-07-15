@@ -202,16 +202,15 @@ function TarjetaEvento({ evento, index }) {
 
 export default function Home() {
   const { user } = useAuth();
-  const { sesiones, loading, error, conectado } = useSesiones();
+  const { sesiones, misUnionesIds, loading, error, conectado } = useSesiones();
   
   const registrados = useMemo(() => {
     if (!user || !sesiones.length) return [];
     
     return sesiones.filter(sesion => 
-      sesion.organizador === user.username ||
-      (sesion.asistentes && sesion.asistentes.some(a => a.username === user.username))
+      sesion.organizador === user.username || misUnionesIds.has(sesion.id)
     );
-  }, [sesiones, user]);
+  }, [sesiones, user, misUnionesIds]);
 
   useEffect(() => {
     if (!loading && registrados.length > 0) {
@@ -236,12 +235,6 @@ export default function Home() {
               <span className="homeBadgeNumber">{registrados.length}</span>
               <span className="homeBadgeLabel">
                 {registrados.length === 1 ? 'Evento' : 'Eventos'}
-              </span>
-            </div>
-            <div className={`homeConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
-              <span className="homeConnectionDot"></span>
-              <span className="homeConnectionText">
-                {conectado ? 'En vivo' : 'Sin conexión'}
               </span>
             </div>
           </div>

@@ -63,6 +63,7 @@ export const api = {
     obtener: (id) => apiFetch(`/sesiones/${id}`, { method: 'GET' }),
     asistentes: (id) => apiFetch(`/asistentes/sesion/${id}`, { method: 'GET' }),
     misRegistros: () => apiFetch('/asistentes/mis-eventos', { method: 'GET' }),
+    misUniones: () => apiFetch('/asistentes/mis-uniones', { method: 'GET' }),
     eliminarAsistente: (idAsistencia) => apiFetch(`/asistentes/${idAsistencia}`, { method: 'DELETE' }),
     crear: (data) => apiFetch('/sesiones', { method: 'POST', body: JSON.stringify(data) }),
     editar: (id, data) => apiFetch(`/sesiones/${id}`, { method: 'PUT', body: JSON.stringify(data) }),

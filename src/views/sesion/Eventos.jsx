@@ -253,7 +253,7 @@ export default function Eventos() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { sesiones, loading, error, conectado, setSesiones, recargar } = useSesiones();
+  const { sesiones, misUnionesIds, loading, error, conectado, setSesiones, recargar } = useSesiones();
 
   const [busqueda, setBusqueda] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('todos'); // 'todos', 'privado', 'publico'
@@ -303,8 +303,7 @@ export default function Eventos() {
 
   const isUserJoined = (sesion) => {
     if (!user) return false;
-    return sesion.asistentes?.some(a => a.username === user.username) ||
-           sesion.organizador === user.username;
+    return misUnionesIds.has(sesion.id) || sesion.organizador === user.username;
   };
 
   // Contar eventos por tipo
@@ -342,12 +341,6 @@ export default function Eventos() {
                 <span className="eventosStatNumber private">{privados}</span>
                 <span className="eventosStatLabel">Privados</span>
               </div>
-            </div>
-            <div className={`eventosConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
-              <span className="eventosConnectionDot"></span>
-              <span className="eventosConnectionText">
-                {conectado ? 'En vivo' : 'Sin conexión'}
-              </span>
             </div>
           </div>
         </div>
