@@ -5,19 +5,48 @@ import { useSesiones } from '../../context/SesionesContext';
 import { useNotificaciones } from '../../hooks/useNotificaciones';
 import '../../styles/Home.css';
 
+// Importar íconos (usando React Icons o SVG inline)
+import { 
+  FiLock, FiGlobe, FiClock, 
+  FiUser, FiUsers, FiAlertCircle, FiCheckCircle,
+  FiActivity, FiAward, FiBookOpen, FiMapPin
+} from 'react-icons/fi';
+import { MdLocationOn, MdAccessTime, MdDateRange } from 'react-icons/md';
+
 const etiquetaTipo = (tipo) => (
   <span className={`homeCardType ${tipo === 'privado' ? 'homeCardTypePrivado' : 'homeCardTypePublico'}`}>
-    {tipo === 'privado' ? '🔒 Privado' : '🌐 Público'}
+    {tipo === 'privado' ? <FiLock className="homeCardTypeIcon" /> : <FiGlobe className="homeCardTypeIcon" />}
+    {tipo === 'privado' ? ' Privado' : ' Público'}
   </span>
 );
 
 function obtenerEstadoInfo(estado) {
   const config = {
-    pendiente: { texto: '⏳ Pendiente', clase: 'homeCardStatePendiente', label: 'Comienza en' },
-    en_curso: { texto: '🔥 En curso', clase: 'homeCardStateEnCurso', label: 'Termina en' },
-    finalizado: { texto: '✅ Finalizado', clase: 'homeCardStateFinalizado', label: 'Evento finalizado' },
+    pendiente: { 
+      texto: 'Por comenzar', 
+      clase: 'homeCardStatePendiente', 
+      label: 'Comienza en',
+      icon: FiClock
+    },
+    en_curso: { 
+      texto: 'En progreso', 
+      clase: 'homeCardStateEnCurso', 
+      label: 'Finaliza en',
+      icon: FiActivity
+    },
+    finalizado: { 
+      texto: 'Completado', 
+      clase: 'homeCardStateFinalizado', 
+      label: 'Evento finalizado',
+      icon: FiCheckCircle
+    },
   };
-  return config[estado] || { texto: '🔷 Disponible', clase: 'homeCardStateDefault', label: 'Estado' };
+  return config[estado] || { 
+    texto: 'Disponible', 
+    clase: 'homeCardStateDefault', 
+    label: 'Estado',
+    icon: FiBookOpen
+  };
 }
 
 function calcularTemporizador(evento) {
@@ -38,7 +67,11 @@ function calcularTemporizador(evento) {
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   const s = Math.floor((diff % 60000) / 1000);
-  if (h >= 24) return `${Math.floor(h / 24)}d ${h % 24}h ${m}m`;
+  
+  if (h >= 24) {
+    const days = Math.floor(h / 24);
+    return `${days}d ${h % 24}h ${m}m`;
+  }
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
@@ -47,6 +80,7 @@ function TarjetaEvento({ evento, index }) {
   const [countdown, setCountdown] = useState(() => calcularTemporizador(evento));
   const [isHovered, setIsHovered] = useState(false);
   const notif5Ref = useRef(false);
+  const cardRef = useRef(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -55,7 +89,7 @@ function TarjetaEvento({ evento, index }) {
 
       if (evento.estado === 'pendiente' && diff > 240000 && diff <= 300000 && !notif5Ref.current) {
         if (Notification.permission === 'granted') {
-          new Notification(`⏰ Empieza en 5 min — ${evento.titulo}`, {
+          new Notification(` Empieza en 5 min — ${evento.titulo}`, {
             body: `Inicia a las ${evento.hora_inicio} en ${evento.sala || 'su sala'}.`,
             icon: '/favicon.ico',
           });
@@ -66,57 +100,79 @@ function TarjetaEvento({ evento, index }) {
       setCountdown(calcularTemporizador(evento));
     }, 1000);
     return () => clearInterval(timer);
-  }, [evento, evento.fecha, evento.hora_inicio, evento.hora_fin, evento.estado, evento.titulo, evento.sala]);
+  }, [evento]);
 
   const ocupados = evento.ocupados ?? 0;
+  const zona= evento.zona || 'No especificada';
   const capacidad = evento.capacidad;
   const porcentaje = capacidad ? Math.round((ocupados / capacidad) * 100) : 0;
   const barColor = porcentaje >= 90 ? '#dc3545' : porcentaje >= 60 ? '#fd7e14' : '#28a745';
 
+  const StateIcon = estadoInfo.icon;
+
   return (
     <div
+      ref={cardRef}
       className={`homeCard ${isHovered ? 'homeCardHovered' : ''}`}
       style={{
-        animation: `slideUp 0.6s ease ${index * 0.1}s both`,
+        animation: `slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Borde superior decorativo */}
+      <div className="homeCardAccent" />
+      
       <div className="homeCardHeader">
-        <span className="homeCardCode">Código: {evento.code || '—'}</span>
+        <div className="homeCardCode">
+          <FiBookOpen className="homeCardCodeIcon" />
+          {evento.code || '---'}
+        </div>
         <div className="homeCardHeaderRight">
           {etiquetaTipo(evento.tipo)}
-          <span className={`homeCardState ${estadoInfo.clase}`}>{estadoInfo.texto}</span>
+          <span className={`homeCardState ${estadoInfo.clase}`}>
+            <StateIcon className="homeCardStateIcon" />
+            {estadoInfo.texto}
+          </span>
         </div>
       </div>
 
       <h3 className="homeCardTitle">{evento.titulo}</h3>
-      <p className="homeCardDescription">{evento.detalles || 'Sin descripción.'}</p>
+      <p className="homeCardDescription">{evento.detalles || 'Sin descripción disponible.'}</p>
 
       <div className="homeCardDetails">
         <div className="homeDetailItem">
-          <span className="homeDetailIcon">📍</span>
-          <span><strong>Sala:</strong> {evento.sala || '—'}</span>
+          <MdLocationOn className="homeDetailIcon" />
+          <span><strong>Sala:</strong> {evento.sala || 'No asignada'}</span>
         </div>
         <div className="homeDetailItem">
-          <span className="homeDetailIcon">📅</span>
-          <span><strong>Fecha:</strong> {evento.fecha || '—'}</span>
+          <FiMapPin className="homeDetailIcon" />
+          <span><strong>Ubicación:</strong> {zona}</span>
         </div>
         <div className="homeDetailItem">
-          <span className="homeDetailIcon">⏰</span>
-          <span><strong>Horario:</strong> {evento.hora_inicio} - {evento.hora_fin}</span>
+          <MdDateRange className="homeDetailIcon" />
+          <span><strong>Fecha:</strong> {evento.fecha || 'No especificada'}</span>
         </div>
         <div className="homeDetailItem">
-          <span className="homeDetailIcon">👤</span>
-          <span><strong>Organizador:</strong> {evento.organizador || '—'}</span>
+          <MdAccessTime className="homeDetailIcon" />
+          <span><strong>Horario:</strong> {evento.hora_inicio} - {evento.hora_fin || '...'}</span>
+        </div>
+        <div className="homeDetailItem">
+          <FiUser className="homeDetailIcon" />
+          <span><strong>Organizador:</strong> {evento.organizador || 'No especificado'}</span>
         </div>
       </div>
 
       {capacidad ? (
         <div className="homeProgressContainer">
           <div className="homeProgressHeader">
-            <span>👥 Asistentes: <strong>{ocupados}</strong> / {capacidad}</span>
-            <span className="homeProgressPercent" style={{ color: barColor }}>{porcentaje}%</span>
+            <div className="homeProgressLabel">
+              <FiUsers className="homeProgressIcon" />
+              <span>Asistentes: <strong>{ocupados}</strong> / {capacidad}</span>
+            </div>
+            <span className="homeProgressPercent" style={{ color: barColor }}>
+              {porcentaje}%
+            </span>
           </div>
           <div className="homeProgressBar">
             <div
@@ -124,27 +180,36 @@ function TarjetaEvento({ evento, index }) {
               style={{
                 width: `${porcentaje}%`,
                 backgroundColor: barColor,
+                transition: 'width 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
               }}
             />
           </div>
         </div>
       ) : (
         <div className="homeAttendeesSimple">
-          👥 Asistentes: <strong>{ocupados}</strong>
+          <FiUsers className="homeAttendeesIcon" />
+          <span>Asistentes: <strong>{ocupados}</strong></span>
         </div>
       )}
 
       <div className={`homeCountdownContainer ${countdown ? 'homeCountdownActive' : 'homeCountdownInactive'}`}>
         {evento.estado === 'finalizado' ? (
-          <div className="homeCountdownFinished">✅ Evento finalizado</div>
+          <div className="homeCountdownFinished">
+            <FiCheckCircle className="homeCountdownIcon" />
+            Evento completado
+          </div>
         ) : countdown ? (
           <>
-            <div className="homeCountdownLabel">{estadoInfo.label}</div>
+            <div className="homeCountdownLabel">
+              <FiClock className="homeCountdownLabelIcon" />
+              {estadoInfo.label}
+            </div>
             <div className="homeCountdownValue">{countdown}</div>
           </>
         ) : (
           <div className="homeCountdownFinished">
-            {evento.estado === 'en_curso' ? '🔥 En curso' : '⏳ Temporizador activo pronto'}
+            <FiActivity className="homeCountdownIcon" />
+            {evento.estado === 'en_curso' ? 'En progreso' : 'Inicia pronto'}
           </div>
         )}
       </div>
@@ -154,29 +219,19 @@ function TarjetaEvento({ evento, index }) {
 
 export default function Home() {
   const { user } = useAuth();
-  // 👇 Usamos el contexto en lugar de estado local
   const { sesiones, loading, error, conectado } = useSesiones();
   
-  // Filtramos SOLO los eventos donde el usuario está registrado
   const registrados = useMemo(() => {
     if (!user || !sesiones.length) return [];
     
-    // Asumimos que el usuario está registrado si:
-    // 1. Es el organizador, o
-    // 2. Aparece en la lista de asistentes
-    // 👇 FIX: sesion.asistentes es un arreglo de OBJETOS ({id, nombre, username, email, ...}),
-    // no de strings — .includes(user.username) comparaba un string contra objetos
-    // y nunca daba true, por eso nunca aparecía la sesión recién unida.
     return sesiones.filter(sesion => 
       sesion.organizador === user.username ||
       (sesion.asistentes && sesion.asistentes.some(a => a.username === user.username))
     );
   }, [sesiones, user]);
 
-  // Notificaciones solo para eventos registrados
   useNotificaciones(registrados);
 
-  // Mostrar estado de conexión (opcional, para debugging)
   useEffect(() => {
     if (!loading && registrados.length > 0) {
       console.log(`📊 Home: ${registrados.length} eventos registrados, SSE: ${conectado ? '✅' : '❌'}`);
@@ -187,20 +242,27 @@ export default function Home() {
     <div className="homeContainer">
       <div className="homeHeader">
         <div className="homeHeaderContent">
-          <div>
-            <h1 className="homeTitle">Mis Eventos</h1>
+          <div className="homeHeaderLeft">
+            <h1 className="homeTitle">
+              Mis Eventos
+            </h1>
             <p className="homeSubtitle">
               Bienvenido, <strong className="homeUsername">{user?.username}</strong>
             </p>
           </div>
-          <div className="homeBadge">
-            <span className="homeBadgeText">
-              {registrados.length} {registrados.length === 1 ? 'Evento' : 'Eventos'}
-            </span>
-            {/* Indicador de conexión en tiempo real */}
-            <span className={`homeConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
-              {conectado ? '🟢' : '🔴'}
-            </span>
+          <div className="homeHeaderRight">
+            <div className="homeBadge">
+              <span className="homeBadgeNumber">{registrados.length}</span>
+              <span className="homeBadgeLabel">
+                {registrados.length === 1 ? 'Evento' : 'Eventos'}
+              </span>
+            </div>
+            <div className={`homeConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
+              <span className="homeConnectionDot"></span>
+              <span className="homeConnectionText">
+                {conectado ? 'En vivo' : 'Sin conexión'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -214,11 +276,7 @@ export default function Home() {
 
       {error && (
         <div className="homeError">
-          <svg className="homeErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+          <FiAlertCircle className="homeErrorIcon" />
           <span>{error}</span>
         </div>
       )}
@@ -226,15 +284,12 @@ export default function Home() {
       {!loading && !error && (
         registrados.length === 0 ? (
           <div className="homeEmpty">
-            <svg className="homeEmptyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
+            <div className="homeEmptyIconContainer">
+              <FiBookOpen className="homeEmptyIcon" />
+            </div>
             <h3 className="homeEmptyTitle">Aún no estás registrado</h3>
             <p className="homeEmptyText">
-              Ve a la sección <strong>Eventos</strong> para unirte a eventos disponibles.
+              Explora la sección <strong>Eventos</strong> para encontrar y unirte a eventos disponibles.
             </p>
           </div>
         ) : (
@@ -244,7 +299,7 @@ export default function Home() {
                 key={sesion.id} 
                 evento={sesion} 
                 index={index} 
-              />
+              /> 
             ))}
           </div>
         )

@@ -1,20 +1,43 @@
-/* Eventos Styles */
-.eventosContainer {
-  padding: 30px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+/* styles/Eventos.css */
+
+:root {
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+  --card-radius: 12px;
+  --transition-speed: 0.3s;
+  --color-primary: #4f46e5;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 }
 
+/* Contenedor principal */
+.eventosContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f8fafc, #ffffff);
+}
+
+/* Encabezado */
 .eventosHeader {
-  margin-bottom: 32px;
-  padding: 24px 32px;
+  margin-bottom: 24px;
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.04);
-  animation: slideDown 0.6s ease;
+  border-radius: var(--card-radius);
+  padding: 24px 28px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--color-gray-100);
 }
 
 .eventosHeaderContent {
@@ -25,498 +48,842 @@
   gap: 16px;
 }
 
+.eventosHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .eventosTitle {
-  margin: 0;
   font-size: 28px;
-  font-weight: 800;
-  color: #1a1a2e;
-  letter-spacing: -0.5px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eventosTitleIcon {
+  font-size: 30px;
 }
 
 .eventosSubtitle {
-  margin: 4px 0 0;
   font-size: 15px;
-  color: #6b7280;
+  color: var(--color-gray-600);
+  margin: 0;
 }
 
-.eventosHeaderActions {
+.eventosHeaderRight {
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 20px;
+}
+
+/* Estadísticas */
+.eventosStats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--color-gray-50);
+  border-radius: 10px;
+  border: 1px solid var(--color-gray-100);
+}
+
+.eventosStatItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.eventosStatNumber {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-gray-800);
+}
+
+.eventosStatNumber.public {
+  color: var(--color-primary);
+}
+
+.eventosStatNumber.private {
+  color: var(--color-warning);
+}
+
+.eventosStatLabel {
+  font-size: 11px;
+  color: var(--color-gray-500);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.eventosStatDivider {
+  width: 1px;
+  height: 30px;
+  background: var(--color-gray-200);
+}
+
+/* Estado de conexión */
+.eventosConnectionStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition-speed);
+}
+
+.eventosConnectionStatus.connected {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.eventosConnectionStatus.disconnected {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.eventosConnectionDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-dot 2s infinite;
+}
+
+.connected .eventosConnectionDot {
+  background: var(--color-success);
+}
+
+.disconnected .eventosConnectionDot {
+  background: var(--color-danger);
+}
+
+.eventosConnectionText {
+  font-size: 13px;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Filtros */
+.eventosFilters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
 .eventosSearchWrapper {
+  flex: 1;
+  min-width: 240px;
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .eventosSearchIcon {
   position: absolute;
   left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gray-400);
   width: 18px;
   height: 18px;
-  color: #9ca3af;
 }
 
 .eventosSearchInput {
-  padding: 10px 12px 10px 38px;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  width: 100%;
+  padding: 10px 40px 10px 36px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 10px;
   font-size: 14px;
-  width: 280px;
-  background-color: #f9fafb;
-  transition: all 0.3s ease;
-  outline: none;
+  transition: all var(--transition-speed);
+  background: white;
+  color: var(--color-gray-800);
 }
 
 .eventosSearchInput:focus {
-  border-color: #406e9b;
-  background-color: white;
-  box-shadow: 0 0 0 4px rgba(64, 110, 155, 0.15);
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-.eventosCreateButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #406e9b 0%, #355a7a 100%);
-  color: white;
+.eventosSearchClear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
   border: none;
-  border-radius: 12px;
+  color: var(--color-gray-400);
+  font-size: 18px;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(64, 110, 155, 0.3);
-  white-space: nowrap;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all var(--transition-speed);
 }
 
-.eventosCreateButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(64, 110, 155, 0.4);
+.eventosSearchClear:hover {
+  color: var(--color-gray-600);
+  background: var(--color-gray-100);
 }
 
-.eventosCreateIcon {
-  width: 18px;
-  height: 18px;
-  color: white;
+.eventosFilterButtons {
+  display: flex;
+  gap: 4px;
+  background: var(--color-gray-50);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--color-gray-200);
 }
 
-.eventosLoading {
-  text-align: center;
-  padding: 60px 20px;
-  animation: fadeIn 0.5s ease;
-}
-
-.eventosSpinner {
-  display: inline-block;
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e2e8f0;
-  border-top-color: #406e9b;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-.eventosLoadingText {
-  margin-top: 16px;
-  color: #6b7280;
-  font-size: 15px;
-}
-
-.eventosError {
+.eventosFilterButton {
+  padding: 6px 14px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  cursor: pointer;
+  transition: all var(--transition-speed);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 12px;
-  color: #dc2626;
-  margin-bottom: 24px;
-  animation: shake 0.5s ease;
+  gap: 6px;
 }
 
-.eventosErrorIcon {
-  width: 24px;
-  height: 24px;
-  color: #ef4444;
-  flex-shrink: 0;
+.eventosFilterButton:hover {
+  color: var(--color-gray-800);
+  background: var(--color-gray-100);
 }
 
-.eventosEmpty {
-  text-align: center;
-  padding: 60px 20px;
+.eventosFilterButton.active {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  animation: fadeIn 0.6s ease;
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.eventosEmptyIcon {
-  width: 64px;
-  height: 64px;
-  color: #9ca3af;
-  margin-bottom: 16px;
+.eventosFilterIcon {
+  width: 14px;
+  height: 14px;
 }
 
-.eventosEmptyTitle {
-  font-size: 20px;
-  color: #1a1a2e;
-  margin-bottom: 8px;
-}
-
-.eventosEmptyText {
-  font-size: 15px;
-  color: #6b7280;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
+/* Grid */
 .eventosGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 24px;
-  animation: fadeIn 0.8s ease;
 }
 
+/* Tarjeta */
 .eventosCard {
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  background: white;
+  border-radius: var(--card-radius);
   padding: 24px;
-  background-color: white;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: default;
+  box-shadow: var(--card-shadow);
+  transition: all var(--transition-speed) cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  border: 1px solid var(--color-gray-100);
+  transform: translateY(0);
+}
+
+.eventosCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .eventosCardHovered {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 40px rgba(64, 110, 155, 0.25), 0 4px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
 }
 
-.eventosCardType {
-  font-size: 11px;
-  font-weight: bold;
-  padding: 4px 12px;
-  border-radius: 20px;
-  background-color: rgba(64, 110, 155, 0.15);
-  color: #406e9b;
-  border: 1px solid #406e9b;
-  animation: fadeIn 0.5s ease;
+.eventosCardAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), #8b5cf6);
+  transition: height var(--transition-speed);
 }
 
-.eventosCardType[data-tipo="privado"] {
-  background-color: rgba(255, 193, 7, 0.15);
-  color: #856404;
-  border-color: #ffc107;
+.eventosCard.adminAccent {
+  background: linear-gradient(90deg, #f59e0b, #f97316);
 }
 
+.eventosCard:hover .eventosCardAccent {
+  height: 4px;
+}
+
+/* Cabecera */
 .eventosCardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .eventosCardCode {
   font-size: 12px;
-  background: #f1f5f9;
-  padding: 4px 12px;
+  font-weight: 500;
+  color: var(--color-gray-500);
+  background: var(--color-gray-50);
+  padding: 4px 10px;
   border-radius: 6px;
-  font-weight: 600;
-  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Courier New', monospace;
 }
 
+.eventosCardCodeIcon {
+  font-size: 14px;
+}
+
+.eventosCardBadges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Tipo */
+.eventosCardType {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.eventosCardTypePublico {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.eventosCardTypePrivado {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.eventosCardTypeIcon {
+  font-size: 12px;
+}
+
+/* Admin Badge */
+.eventosAdminBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #fef3c7;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.eventosAdminBadgeIcon {
+  font-size: 12px;
+}
+
+/* Título */
 .eventosCardTitle {
-  margin: 8px 0 6px 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1a1a2e;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin: 0 0 8px 0;
   line-height: 1.3;
 }
 
 .eventosCardDescription {
-  color: #6b7280;
   font-size: 14px;
+  color: var(--color-gray-600);
   margin: 0 0 16px 0;
   line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
+/* Detalles */
 .eventosCardDetails {
-  font-size: 13px;
-  color: #475569;
-  line-height: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
   margin-bottom: 16px;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-gray-100);
+  border-bottom: 1px solid var(--color-gray-100);
 }
 
 .eventosDetailItem {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-gray-700);
 }
 
 .eventosDetailIcon {
-  width: 20px;
-  text-align: center;
+  font-size: 16px;
+  color: var(--color-gray-400);
+  flex-shrink: 0;
 }
 
+.eventosDetailItem strong {
+  font-weight: 600;
+  color: var(--color-gray-800);
+}
+
+/* Mensajes */
 .eventosMessage {
-  padding: 10px 14px;
-  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
   margin-bottom: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  border: 1px solid;
-  animation: fadeIn 0.3s ease;
+  font-size: 14px;
+  animation: slideIn 0.3s ease;
 }
 
 .eventosMessageOk {
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #16a34a;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
 }
 
 .eventosMessageError {
-  background-color: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
 }
 
+.eventosMessageIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Unirse - Privado */
 .eventosPrivateJoin {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.eventosPasswordWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.eventosPasswordIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gray-400);
+  width: 16px;
+  height: 16px;
 }
 
 .eventosPasswordInput {
-  flex: 1;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 2px solid #e5e7eb;
-  font-size: 13px;
-  outline: none;
-  transition: all 0.3s ease;
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all var(--transition-speed);
 }
 
 .eventosPasswordInput:focus {
-  border-color: #406e9b;
-  box-shadow: 0 0 0 4px rgba(64, 110, 155, 0.15);
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
+.eventosPasswordInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Botón Unirse */
 .eventosJoinButton {
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px;
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
+  border-radius: 8px;
   font-size: 14px;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
   white-space: nowrap;
 }
 
 .eventosJoinButtonPublic {
   width: 100%;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: var(--color-primary);
   color: white;
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+  padding: 10px 20px;
 }
 
 .eventosJoinButtonPublic:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .eventosJoinButtonPrivate {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .eventosJoinButtonPrivate:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+  background: #fde68a;
+  transform: translateY(-1px);
 }
 
 .eventosButtonDisabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.eventosButtonDisabled:hover {
   transform: none !important;
-  box-shadow: none !important;
 }
 
+.eventosJoinIcon {
+  font-size: 16px;
+}
+
+/* Loading spinner */
 .eventosLoadingSpinner {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: center;
 }
 
 .eventosSmallSpinner {
-  display: inline-block;
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  display: inline-block;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Acciones Admin */
 .eventosAdminActions {
   display: flex;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 8px;
+}
+
+.eventosEditButton,
+.eventosDeleteButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.eventosActionIcon {
+  font-size: 14px;
 }
 
 .eventosEditButton {
+  background: #dbeafe;
+  color: #1e40af;
   flex: 1;
-  padding: 10px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 13px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  justify-content: center;
 }
 
 .eventosEditButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+  background: #bfdbfe;
+  transform: translateY(-1px);
 }
 
 .eventosDeleteButton {
+  background: #fef2f2;
+  color: #dc2626;
   flex: 1;
-  padding: 10px;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 13px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  justify-content: center;
 }
 
 .eventosDeleteButton:hover {
+  background: #fca5a5;
+  transform: translateY(-1px);
+}
+
+/* Estados */
+.eventosLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.eventosSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-gray-100);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.eventosLoadingText {
+  margin-top: 16px;
+  color: var(--color-gray-500);
+  font-size: 14px;
+}
+
+.eventosError {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fef2f2;
+  color: #991b1b;
+  padding: 16px 20px;
+  border-radius: var(--card-radius);
+  border: 1px solid #fca5a5;
+  flex-wrap: wrap;
+}
+
+.eventosErrorIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.eventosRetryButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #991b1b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition-speed);
+  margin-left: auto;
+}
+
+.eventosRetryButton:hover {
+  background: #7f1d1d;
+  transform: scale(1.02);
+}
+
+.eventosRetryIcon {
+  font-size: 14px;
+}
+
+.eventosEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--color-gray-100);
+  min-height: 300px;
+}
+
+.eventosEmptyIconContainer {
+  width: 80px;
+  height: 80px;
+  background: var(--color-gray-50);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-gray-200);
+}
+
+.eventosEmptyIcon {
+  font-size: 36px;
+  color: var(--color-gray-400);
+}
+
+.eventosEmptyTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-gray-800);
+  margin: 0 0 8px 0;
+}
+
+.eventosEmptyText {
+  font-size: 14px;
+  color: var(--color-gray-500);
+  margin: 0 0 20px 0;
+  max-width: 400px;
+}
+
+.eventosCreateButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.eventosCreateButton:hover {
+  background: var(--color-primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
-/* Animations */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.eventosCreateIcon {
+  font-size: 18px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
+/* Animación de entrada */
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-8px);
-  }
-  75% {
-    transform: translateX(8px);
+    transform: translateY(0) scale(1);
   }
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .eventosHeader {
-    padding: 20px;
+@media (max-width: 1024px) {
+  .eventosHeaderContent {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .eventosHeaderActions {
-    width: 100%;
+  .eventosHeaderRight {
+    justify-content: space-between;
   }
 
-  .eventosSearchInput {
-    width: 100%;
-  }
-
-  .eventosCreateButton {
-    width: 100%;
-    justify-content: center;
+  .eventosStats {
+    flex: 1;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .eventosGrid {
     grid-template-columns: 1fr;
+  }
+
+  .eventosHeader {
+    padding: 16px 20px;
   }
 
   .eventosTitle {
     font-size: 22px;
   }
 
-  .eventosCard {
-    padding: 20px;
+  .eventosFilters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .eventosSearchWrapper {
+    min-width: unset;
+  }
+
+  .eventosFilterButtons {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .eventosFilterButton {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .eventosHeaderRight {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .eventosStats {
+    justify-content: space-around;
+  }
+
+  .eventosCardDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .eventosPrivateJoin {
+    flex-direction: column;
+  }
+
+  .eventosAdminActions {
+    flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
   .eventosContainer {
+    padding: 16px 12px;
+  }
+
+  .eventosCard {
     padding: 16px;
   }
 
-  .eventosHeader {
-    padding: 16px;
+  .eventosStats {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 
-  .eventosTitle {
-    font-size: 20px;
-  }
-
-  .eventosPrivateJoin {
-    flex-direction: column;
+  .eventosStatNumber {
+    font-size: 16px;
   }
 }

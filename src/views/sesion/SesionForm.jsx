@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { 
+  FiEdit2, FiPlus, FiSave, FiX, FiAlertCircle, 
+  FiCheckCircle, FiLock, FiGlobe, FiCalendar,
+  FiClock, FiMapPin, FiBookOpen,
+  FiChevronDown, FiKey, FiInfo, FiUsers
+} from 'react-icons/fi';
+import { MdLocationOn, MdAccessTime, MdDateRange, MdPeople } from 'react-icons/md';
 import '../../styles/SesionForm.css';
 
 const EMPTY = { 
@@ -118,18 +125,25 @@ export default function SesionForm() {
     }
   };
 
-  const campo = (label, name, type = 'text', placeholder = '') => (
+  const campo = (label, name, type = 'text', placeholder = '', icon = null) => (
     <div className="formInputGroup">
-      <label className="formLabel">{label}</label>
-      <input
-        type={type}
-        name={name}
-        value={form[name]}
-        onChange={handleChange}
-        placeholder={placeholder}
-        className="formInput"
-        disabled={loading}
-      />
+      <label className="formLabel">
+        {label}
+        {type !== 'hidden' && <span className="formLabelRequired">*</span>}
+      </label>
+      <div className="formInputWrapper">
+        {icon && <span className="formInputIcon">{icon}</span>}
+        <input
+          type={type}
+          name={name}
+          value={form[name]}
+          onChange={handleChange}
+          placeholder={placeholder}
+          className={`formInput ${icon ? 'formInputWithIcon' : ''}`}
+          disabled={loading}
+          required={type !== 'hidden'}
+        />
+      </div>
     </div>
   );
 
@@ -138,11 +152,7 @@ export default function SesionForm() {
       <div className="formContainer">
         <div className="formCard">
           <div className="formError">
-            <svg className="formErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
+            <FiAlertCircle className="formErrorIcon" />
             <span className="formErrorText">No tienes permiso para editar este evento — solo el organizador puede hacerlo.</span>
           </div>
           <button
@@ -151,6 +161,7 @@ export default function SesionForm() {
             className="formCancelButton"
             style={{ marginTop: '1rem' }}
           >
+            <FiX className="formButtonIcon" />
             Volver
           </button>
         </div>
@@ -161,119 +172,173 @@ export default function SesionForm() {
   return (
     <div className="formContainer">
       <div className="formCard">
+        <div className="formCardAccent" />
+        
         <div className="formHeader">
-          <div className="formLogoContainer">
-            <svg className="formLogo" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {esEdicion ? (
-                <>
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
-                </>
-              ) : (
-                <>
-                  <path d="M12 5v14" />
-                  <path d="M5 12h14" />
-                </>
-              )}
-            </svg>
+          <div className="formIconContainer">
+            {esEdicion ? (
+              <FiEdit2 className="formHeaderIcon" />
+            ) : (
+              <FiPlus className="formHeaderIcon" />
+            )}
           </div>
-          <h1 className="formTitle">
-            {esEdicion ? 'Editar Evento' : 'Nuevo Evento'}
-          </h1>
-          <p className="formSubtitle">
-            {esEdicion 
-              ? 'Actualiza la información del evento' 
-              : 'Completa los datos para crear un nuevo evento'}
-          </p>
+          <div className="formHeaderText">
+            <h1 className="formTitle">
+              {esEdicion ? 'Editar Evento' : 'Nuevo Evento'}
+            </h1>
+            <p className="formSubtitle">
+              {esEdicion 
+                ? 'Actualiza la información del evento' 
+                : 'Completa los datos para crear un nuevo evento'}
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="formError">
-            <svg className="formErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <span className="formErrorText">{error}</span>
+          <div className="formMessage formMessageError">
+            <FiAlertCircle className="formMessageIcon" />
+            <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="formSuccess">
-            <svg className="formSuccessIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-              <polyline points="22 4 12 14.01 9 11.01" />
-            </svg>
-            <span className="formSuccessText">{success}</span>
+          <div className="formMessage formMessageSuccess">
+            <FiCheckCircle className="formMessageIcon" />
+            <span>{success}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="form">
-          <div className="formGrid">
-            {campo('Título *', 'titulo', 'text', 'Ej. Conferencia inaugural')}
-            {campo('Código', 'code', 'text', 'Ej. CONF-01')}
-            {campo('Sala', 'sala', 'text', 'Ej. Auditorio A')}
-            {campo('Zona', 'zona', 'text', 'Ej. Zona Norte')}
-            {campo('Capacidad', 'capacidad', 'number', 'Ej. 200')}
-            {campo('Fecha', 'fecha', 'date')}
-          </div>
-
-          <div className="formTimeGrid">
-            {campo('Hora inicio', 'hora_inicio', 'time')}
-            {campo('Hora fin', 'hora_fin', 'time')}
-          </div>
-
-          <div className="formInputGroup">
-            <label className="formLabel">Visibilidad</label>
-            <div className="formSelectWrapper">
-              <select
-                name="tipo"
-                value={form.tipo}
-                onChange={handleChange}
-                className="formSelect"
-                disabled={loading}
-              >
-                <option value="publico">🌐 Público</option>
-                <option value="privado">🔒 Privado</option>
-              </select>
-              <svg className="formSelectIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+          {/* Información básica */}
+          <div className="formSection">
+            <div className="formSectionHeader">
+              <FiBookOpen className="formSectionIcon" />
+              <h2 className="formSectionTitle">Información Básica</h2>
+            </div>
+            <div className="formGrid">
+              {campo('Título', 'titulo', 'text', 'Ej. Conferencia inaugural', <FiInfo />)}
+              {campo('Código', 'code', 'text', 'Ej. CONF-01', <FiBookOpen />)}
             </div>
           </div>
 
-          {form.tipo === 'privado' && (
-            <div className="formInputGroup formPasswordGroup">
-              <label className="formLabel">Contraseña del evento *</label>
-              <div className="formInputWrapper">
-                <svg className="formInputIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0110 0v4" />
-                </svg>
-                <input
-                  type="password"
-                  name="password"
-                  value={form.password}
+          {/* Ubicación */}
+          <div className="formSection">
+            <div className="formSectionHeader">
+              <FiMapPin className="formSectionIcon" />
+              <h2 className="formSectionTitle">Ubicación</h2>
+            </div>
+            <div className="formGrid">
+              {campo('Sala', 'sala', 'text', 'Ej. Auditorio A', <MdLocationOn />)}
+              {campo('Ubicación', 'ubicacion', 'text', 'Ej. Zona Norte', <FiMapPin />)}
+            </div>
+          </div>
+
+          {/* Fecha y hora */}
+          <div className="formSection">
+            <div className="formSectionHeader">
+              <FiCalendar className="formSectionIcon" />
+              <h2 className="formSectionTitle">Fecha y Horario</h2>
+            </div>
+            <div className="formGrid">
+              {campo('Fecha', 'fecha', 'date', '', <MdDateRange />)}
+            </div>
+            <div className="formTimeGrid">
+              {campo('Hora Inicio', 'hora_inicio', 'time', '', <FiClock />)}
+              {campo('Hora Fin', 'hora_fin', 'time', '', <MdAccessTime />)}
+            </div>
+          </div>
+
+          {/* Capacidad */}
+          <div className="formSection">
+            <div className="formSectionHeader">
+              <FiUsers className="formSectionIcon" />
+              <h2 className="formSectionTitle">Capacidad</h2>
+            </div>
+            <div className="formGrid">
+              {campo('Capacidad', 'capacidad', 'number', 'Ej. 200', <MdPeople />)}
+            </div>
+          </div>
+
+          {/* Visibilidad */}
+          <div className="formSection">
+            <div className="formSectionHeader">
+              <FiGlobe className="formSectionIcon" />
+              <h2 className="formSectionTitle">Visibilidad</h2>
+            </div>
+            <div className="formInputGroup">
+              <label className="formLabel">
+                Tipo de Evento
+                <span className="formLabelRequired">*</span>
+              </label>
+              <div className="formSelectWrapper">
+                <select
+                  name="tipo"
+                  value={form.tipo}
                   onChange={handleChange}
-                  placeholder="Contraseña para acceder al evento privado"
-                  className="formInput formInputWithIcon"
+                  className="formSelect"
                   disabled={loading}
-                />
+                >
+                  <option value="publico">
+                    <FiGlobe className="formSelectOptionIcon" />
+                    Público - Acceso sin contraseña
+                  </option>
+                  <option value="privado">
+                    <FiLock className="formSelectOptionIcon" />
+                    Privado - Requiere contraseña
+                  </option>
+                </select>
+                <FiChevronDown className="formSelectIcon" />
               </div>
             </div>
-          )}
 
-          <div className="formInputGroup">
-            <label className="formLabel">Detalles</label>
-            <textarea
-              name="detalles"
-              value={form.detalles}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Descripción de la sesión..."
-              className="formTextarea"
-              disabled={loading}
-            />
+            {form.tipo === 'privado' && (
+              <div className="formInputGroup formPasswordGroup">
+                <label className="formLabel">
+                  Contraseña del evento
+                  <span className="formLabelRequired">*</span>
+                </label>
+                <div className="formInputWrapper">
+                  <FiKey className="formInputIcon" />
+                  <input
+                    type="password"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    placeholder="Contraseña para acceder al evento privado"
+                    className="formInput formInputWithIcon"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="formHelperText">
+                  <FiInfo className="formHelperIcon" />
+                  <span>La contraseña será requerida para unirse al evento</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Detalles */}
+          <div className="formSection">
+            <div className="formSectionHeader">
+              <FiInfo className="formSectionIcon" />
+              <h2 className="formSectionTitle">Detalles Adicionales</h2>
+            </div>
+            <div className="formInputGroup">
+              <label className="formLabel">Descripción</label>
+              <textarea
+                name="detalles"
+                value={form.detalles}
+                onChange={handleChange}
+                rows={4}
+                placeholder="Descripción detallada de la sesión..."
+                className="formTextarea"
+                disabled={loading}
+              />
+              <div className="formHelperText">
+                <span>Máximo 500 caracteres</span>
+                <span>{form.detalles?.length || 0}/500</span>
+              </div>
+            </div>
           </div>
 
           <div className="formButtonGroup">
@@ -288,7 +353,10 @@ export default function SesionForm() {
                   Guardando...
                 </span>
               ) : (
-                esEdicion ? 'Actualizar Sesión' : 'Crear Sesión'
+                <>
+                  <FiSave className="formButtonIcon" />
+                  {esEdicion ? 'Actualizar Evento' : 'Crear Evento'}
+                </>
               )}
             </button>
             <button
@@ -297,6 +365,7 @@ export default function SesionForm() {
               className="formCancelButton"
               disabled={loading}
             >
+              <FiX className="formButtonIcon" />
               Cancelar
             </button>
           </div>

@@ -5,9 +5,129 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--page-bg);
+  color: var(--page-text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+:root {
+  --page-bg: #f8fafc;
+  --page-text: #111827;
+  --page-surface: #ffffff;
+  --page-border: #e5e7eb;
+  --page-text-muted: #4b5563;
+  --navbar-bg: #ffffff;
+  --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --navbar-shadow-scrolled: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --color-primary: #4f46e5;
+  --color-primary-dark: #4338ca;
+  --color-primary-light: #818cf8;
+  --color-secondary: #8b5cf6;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+}
+
+.dark {
+  --page-bg: #0f172a;
+  --page-text: #f8fafc;
+  --page-surface: #111827;
+  --page-border: #334155;
+  --page-text-muted: #94a3b8;
+  --navbar-bg: #0f172a;
+  --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.12);
+  --navbar-shadow-scrolled: 0 4px 20px rgba(0, 0, 0, 0.25);
+  --color-primary: #8b5cf6;
+  --color-primary-dark: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-secondary: #c084fc;
+  --color-gray-50: #111827;
+  --color-gray-100: #1e293b;
+  --color-gray-200: #273449;
+  --color-gray-300: #334155;
+  --color-gray-400: #475569;
+  --color-gray-500: #64748b;
+  --color-gray-600: #94a3b8;
+  --color-gray-700: #cbd5e1;
+  --color-gray-800: #e2e8f0;
+  --color-gray-900: #f8fafc;
+}
+
+.dark .homeContainer,
+.dark .eventosContainer,
+.dark .datosSesionContainer,
+.dark .formContainer,
+.dark .notfoundContainer {
+  background: var(--page-bg);
+}
+
+.dark .homeHeader,
+.dark .eventosHeader,
+.dark .datosSesionHeader,
+.dark .formCard,
+.dark .loginCard,
+.dark .registerCard,
+.dark .navbar,
+.dark .userDropdown,
+.dark .navLinks,
+.dark .homeCard,
+.dark .eventosCard,
+.dark .eventosCardAdmin,
+.dark .datosSesionPanel,
+.dark .formCard,
+.dark .escanearLectorWrapper,
+.dark .escanearHistorial,
+.dark .escanearHistorialItem,
+.dark .notfoundCard,
+.dark .homeBadge,
+.dark .eventosFilterButtons,
+.dark .eventosSearchInput,
+.dark .formInput,
+.dark .formSelect,
+.dark .formTextarea {
+  background: var(--page-surface);
+  border-color: var(--page-border);
+  color: var(--page-text);
+}
+
+.dark .homeCardCode,
+.dark .eventosCardCode,
+.dark .datosSesionPanelCode,
+.dark .homeCardTypePublico,
+.dark .homeCardTypePrivado,
+.dark .homeCardStatePendiente,
+.dark .homeCardStateEnCurso,
+.dark .homeCardStateFinalizado {
+  background: var(--page-bg);
+}
+
+.dark .loginContainer,
+.dark .loginCard,
+.dark .registerContainer,
+.dark .registerCard {
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+.dark .loginContainer,
+.dark .registerContainer {
+  background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #ffffff 100%) !important;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.dark body {
+  background: var(--page-bg);
+  color: var(--page-text);
 }

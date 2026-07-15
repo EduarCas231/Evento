@@ -4,19 +4,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #3a3a5c 100%);
+  background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #ffffff 100%);
   padding: 20px;
 }
 
 .registerCard {
   background-color: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 24px;
   padding: 45px;
   max-width: 440px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(64, 110, 155, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
   transition: transform 0.2s;
   animation: slideUp 0.6s ease;
+}
+
+.registerContainer,
+.registerCard {
+  color: #111827;
+}
+
+.registerCard {
+  background-color: #ffffff;
 }
 
 .registerHeader {

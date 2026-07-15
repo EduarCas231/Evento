@@ -4,22 +4,48 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useSesiones } from '../../context/SesionesContext';
+import { 
+  FiLock, FiGlobe, FiClock, FiCalendar, FiMapPin, 
+  FiUser, FiUsers, FiEdit2, FiTrash2, FiEye,
+  FiPlay, FiSquare, FiCamera, FiPlus, FiCheckCircle,
+  FiAlertCircle, FiRefreshCw, FiBookOpen, FiAward,
+  FiMail, FiUserCheck, FiUserX, FiActivity
+} from 'react-icons/fi';
+import { MdLocationOn, MdAccessTime, MdDateRange, MdPeople, MdEvent, MdOutlineQrCodeScanner } from 'react-icons/md';
 import '../../styles/DatosSesion.css';
 
 const EtiquetaTipo = ({ tipo }) => (
   <span className={`datosSesionEtiqueta ${tipo === 'privado' ? 'datosSesionEtiquetaPrivado' : 'datosSesionEtiquetaPublico'}`}>
-    {tipo === 'privado' ? '🔒 Privado' : '🌐 Público'}
+    {tipo === 'privado' ? <FiLock className="datosSesionEtiquetaIcon" /> : <FiGlobe className="datosSesionEtiquetaIcon" />}
+    {tipo === 'privado' ? ' Privado' : ' Público'}
   </span>
 );
 
 const EtiquetaEstado = ({ estado }) => {
   const config = {
-    pendiente: { texto: '⏳ Pendiente', clase: 'datosSesionEstadoPendiente' },
-    en_curso: { texto: '🟢 En curso', clase: 'datosSesionEstadoEnCurso' },
-    finalizado: { texto: '🏁 Finalizado', clase: 'datosSesionEstadoFinalizado' },
+    pendiente: { 
+      texto: 'Pendiente', 
+      clase: 'datosSesionEstadoPendiente',
+      icon: FiClock
+    },
+    en_curso: { 
+      texto: 'En curso', 
+      clase: 'datosSesionEstadoEnCurso',
+      icon: FiActivity
+    },
+    finalizado: { 
+      texto: 'Finalizado', 
+      clase: 'datosSesionEstadoFinalizado',
+      icon: FiCheckCircle
+    },
   };
-  const { texto, clase } = config[estado] || config.pendiente;
-  return <span className={`datosSesionEtiquetaEstado ${clase}`}>{texto}</span>;
+  const { texto, clase, icon: Icon } = config[estado] || config.pendiente;
+  return (
+    <span className={`datosSesionEtiquetaEstado ${clase}`}>
+      <Icon className="datosSesionEstadoIcon" />
+      {texto}
+    </span>
+  );
 };
 
 const BarraAsistencia = ({ ocupados, capacidad, etiqueta }) => {
@@ -31,10 +57,25 @@ const BarraAsistencia = ({ ocupados, capacidad, etiqueta }) => {
   return (
     <div className="datosSesionBarraContainer">
       <div className="datosSesionBarraHeader">
-        <span>👥 <strong>{ocupados}</strong> {etiqueta}</span>
+        <div className="datosSesionBarraInfo">
+          <FiUsers className="datosSesionBarraIcon" />
+          <span>
+            <strong>{ocupados}</strong> {etiqueta}
+          </span>
+        </div>
         {disponibles !== null && (
           <span className={`datosSesionBarraDisponibles ${disponibles === 0 ? 'datosSesionBarraLleno' : 'datosSesionBarraDisponible'}`}>
-            {disponibles === 0 ? '🚫 Sin lugares' : `✅ ${disponibles} lugares disponibles`}
+            {disponibles === 0 ? (
+              <>
+                <FiUserX className="datosSesionBarraStatusIcon" />
+                Sin lugares
+              </>
+            ) : (
+              <>
+                <FiUserCheck className="datosSesionBarraStatusIcon" />
+                {disponibles} lugares disponibles
+              </>
+            )}
           </span>
         )}
       </div>
@@ -66,7 +107,7 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinaliza
       .then(setDatos)
       .catch(() => setDatos({ ocupados: 0, capacidad: evento.capacidad, asistentes: [] }))
       .finally(() => setLoading(false));
-  }, [evento.id]);
+  }, [evento.id, evento.capacidad]);
 
   React.useEffect(() => {
     cargarAsistentes();
@@ -111,72 +152,92 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinaliza
   return (
     <div 
       className={`datosSesionPanel ${isHovered ? 'datosSesionPanelHovered' : ''}`}
-      style={{ animationDelay: `${index * 0.1}s` }}
+      style={{ 
+        animation: `slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both` 
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <div className="datosSesionPanelAccent" />
+      
       <div className="datosSesionPanelHeader">
         <div className="datosSesionPanelHeaderLeft">
-          <span className="datosSesionPanelCode">{evento.code || '—'}</span>
+          <div className="datosSesionPanelCode">
+            <FiBookOpen className="datosSesionCodeIcon" />
+            {evento.code || '—'}
+          </div>
           <EtiquetaTipo tipo={evento.tipo} />
           <EtiquetaEstado estado={evento.estado} />
         </div>
         <div className="datosSesionPanelActions">
           {evento.estado === 'pendiente' && (
-            <button onClick={handleIniciar} disabled={cambiandoEstado} className="datosSesionStartButton">
-              ▶️ Iniciar evento
+            <button 
+              onClick={handleIniciar} 
+              disabled={cambiandoEstado} 
+              className="datosSesionStartButton"
+            >
+              <FiPlay className="datosSesionActionIcon" />
+              Iniciar
             </button>
           )}
           {evento.estado === 'en_curso' && (
-            <button onClick={handleFinalizar} disabled={cambiandoEstado} className="datosSesionEndButton">
-              ⏹️ Finalizar evento
+            <button 
+              onClick={handleFinalizar} 
+              disabled={cambiandoEstado} 
+              className="datosSesionEndButton"
+            >
+              <FiSquare className="datosSesionActionIcon" />
+              Finalizar
             </button>
           )}
           <button
             onClick={() => navigate(`/sesiones/escanear/${evento.id}`)}
-            className="datosSesionScanButton"
+            className={`datosSesionScanButton ${evento.estado !== 'en_curso' ? 'disabled' : ''}`}
             disabled={evento.estado !== 'en_curso'}
             title={evento.estado !== 'en_curso' ? 'El evento debe estar en curso para escanear' : 'Ir al escáner'}
           >
-            📷 Escanear
+            <MdOutlineQrCodeScanner className="datosSesionActionIcon" />
+            Escanear
           </button>
           <button onClick={onEditar} className="datosSesionEditButton">
-            ✏️ Editar
+            <FiEdit2 className="datosSesionActionIcon" />
+            Editar
           </button>
           <button onClick={onEliminarSesion} className="datosSesionDeleteButton">
-            🗑️ Eliminar
+            <FiTrash2 className="datosSesionActionIcon" />
+            Eliminar
           </button>
         </div>
       </div>
 
       <div className="datosSesionPanelBody">
         <h3 className="datosSesionPanelTitle">{evento.titulo}</h3>
-        <p className="datosSesionPanelDescription">{evento.detalles || 'Sin descripción.'}</p>
+        <p className="datosSesionPanelDescription">{evento.detalles || 'Sin descripción disponible.'}</p>
 
         <div className="datosSesionInfoGrid">
           <div className="datosSesionInfoItem">
-            <span className="datosSesionInfoIcon">📍</span>
-            <span><strong>Sala:</strong> {evento.sala || '—'}</span>
+            <MdLocationOn className="datosSesionInfoIcon" />
+            <span><strong>Sala:</strong> {evento.sala || 'No asignada'}</span>
           </div>
           <div className="datosSesionInfoItem">
-            <span className="datosSesionInfoIcon">🗺️</span>
-            <span><strong>Zona:</strong> {evento.zona || '—'}</span>
+            <FiMapPin className="datosSesionInfoIcon" />
+            <span><strong>Ubicación:</strong> {evento.zona || 'No especificada'}</span>
           </div>
           <div className="datosSesionInfoItem">
-            <span className="datosSesionInfoIcon">📅</span>
-            <span><strong>Fecha:</strong> {evento.fecha || '—'}</span>
+            <MdDateRange className="datosSesionInfoIcon" />
+            <span><strong>Fecha:</strong> {evento.fecha || 'No especificada'}</span>
           </div>
           <div className="datosSesionInfoItem">
-            <span className="datosSesionInfoIcon">⏰</span>
-            <span><strong>Horario:</strong> {evento.hora_inicio} - {evento.hora_fin}</span>
+            <MdAccessTime className="datosSesionInfoIcon" />
+            <span><strong>Horario:</strong> {evento.hora_inicio} - {evento.hora_fin || '...'}</span>
           </div>
           <div className="datosSesionInfoItem">
-            <span className="datosSesionInfoIcon">🎯</span>
-            <span><strong>Capacidad:</strong> {evento.capacidad ? `${evento.capacidad} personas` : '—'}</span>
+            <MdPeople className="datosSesionInfoIcon" />
+            <span><strong>Capacidad:</strong> {evento.capacidad ? `${evento.capacidad} personas` : 'Ilimitada'}</span>
           </div>
           <div className="datosSesionInfoItem">
-            <span className="datosSesionInfoIcon">👤</span>
-            <span><strong>Organizador:</strong> {evento.organizador || '—'}</span>
+            <FiUser className="datosSesionInfoIcon" />
+            <span><strong>Organizador:</strong> {evento.organizador || 'No especificado'}</span>
           </div>
         </div>
 
@@ -192,7 +253,8 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinaliza
         <div className="datosSesionParticipantesContainer">
           <div className="datosSesionParticipantesHeader">
             <h4 className="datosSesionParticipantesTitle">
-              {evento.estado === 'pendiente' ? '👥 Participantes' : '✅ Asistencia'}
+              <FiUsers className="datosSesionParticipantesIcon" />
+              {evento.estado === 'pendiente' ? 'Participantes' : 'Asistencia'}
             </h4>
             <span className="datosSesionParticipantesCount">
               {datos?.asistentes?.length || 0} {datos?.asistentes?.length === 1 ? 'participante' : 'participantes'}
@@ -203,12 +265,7 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinaliza
             <p className="datosSesionParticipantesLoading">Cargando participantes...</p>
           ) : !datos?.asistentes?.length ? (
             <div className="datosSesionParticipantesEmpty">
-              <svg className="datosSesionEmptyIconSmall" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 00-3-3.87" />
-                <path d="M16 3.13a4 4 0 010 7.75" />
-              </svg>
+              <FiUsers className="datosSesionEmptyIconSmall" />
               <span>Sin participantes registrados</span>
             </div>
           ) : (
@@ -226,16 +283,30 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinaliza
                 <tbody>
                   {datos.asistentes.map((a, idx) => (
                     <tr key={a.id} className="datosSesionTableRow" style={{ animationDelay: `${idx * 0.05}s` }}>
-                      <td className="datosSesionTableCell">{a.nombre || a.username}</td>
-                      <td className="datosSesionTableCell datosSesionTableCellEmail">{a.email}</td>
+                      <td className="datosSesionTableCell">
+                        <span className="datosSesionParticipantName">
+                          {a.nombre || a.username}
+                        </span>
+                      </td>
+                      <td className="datosSesionTableCell datosSesionTableCellEmail">
+                        <FiMail className="datosSesionEmailIcon" />
+                        {a.email}
+                      </td>
                       <td className="datosSesionTableCell datosSesionTableCellFecha">
+                        <FiClock className="datosSesionFechaIcon" />
                         {a.hora_ingreso || a.fecha_registro || '—'}
                       </td>
                       <td className="datosSesionTableCell">
                         {a.presente ? (
-                          <span title={a.check_in_hora || ''}>✅ Presente</span>
+                          <span className="datosSesionPresente" title={a.check_in_hora || ''}>
+                            <FiCheckCircle className="datosSesionPresenteIcon" />
+                            Presente
+                          </span>
                         ) : (
-                          <span>⏳ Sin escanear</span>
+                          <span className="datosSesionAusente">
+                            <FiClock className="datosSesionAusenteIcon" />
+                            Sin escanear
+                          </span>
                         )}
                       </td>
                       <td className="datosSesionTableCell datosSesionTableCellRight">
@@ -243,6 +314,7 @@ const PanelEvento = ({ evento, onEditar, onEliminarSesion, onIniciar, onFinaliza
                           onClick={() => handleEliminarAsistente(a.id, a.nombre || a.username)}
                           className="datosSesionRemoveButton"
                         >
+                          <FiUserX className="datosSesionRemoveIcon" />
                           Eliminar
                         </button>
                       </td>
@@ -273,6 +345,13 @@ export default function DatosEvento() {
     return misEventos.reduce((acc, s) => acc + (s.capacidad || 0), 0);
   }, [misEventos]);
 
+  const stats = useMemo(() => {
+    const pendientes = misEventos.filter(s => s.estado === 'pendiente').length;
+    const enCurso = misEventos.filter(s => s.estado === 'en_curso').length;
+    const finalizados = misEventos.filter(s => s.estado === 'finalizado').length;
+    return { pendientes, enCurso, finalizados };
+  }, [misEventos]);
+
   const handleEliminarEvento = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este evento?')) return;
     try {
@@ -285,10 +364,12 @@ export default function DatosEvento() {
 
   const handleIniciarEvento = async (id) => {
     await api.sesiones.iniciar(id);
+    await recargar();
   };
 
   const handleFinalizarEvento = async (id) => {
     await api.sesiones.finalizar(id);
+    await recargar();
   };
 
   if (loading) {
@@ -304,30 +385,53 @@ export default function DatosEvento() {
     <div className="datosSesionContainer">
       <div className="datosSesionHeader">
         <div className="datosSesionHeaderContent">
-          <div>
-            <h1 className="datosSesionTitle">Datos de Mis Eventos</h1>
+          <div className="datosSesionHeaderLeft">
+            <h1 className="datosSesionTitle">
+              Mis Eventos
+            </h1>
             <p className="datosSesionSubtitle">
               {misEventos.length} evento{misEventos.length !== 1 ? 's' : ''} creado{misEventos.length !== 1 ? 's' : ''}
-              {conectado && <span className="datosSesionLiveIndicator">🟢 En vivo</span>}
+              {conectado && <span className="datosSesionLiveIndicator">● En vivo</span>}
             </p>
           </div>
-          <div className="datosSesionBadge">
-            <span className="datosSesionBadgeText">
-              📊 {capacidadTotal} capacidad total
-            </span>
+          <div className="datosSesionHeaderRight">
+            <div className="datosSesionStats">
+              <div className="datosSesionStatItem">
+                <span className="datosSesionStatNumber">{stats.pendientes}</span>
+                <span className="datosSesionStatLabel">Pendientes</span>
+              </div>
+              <div className="datosSesionStatDivider" />
+              <div className="datosSesionStatItem">
+                <span className="datosSesionStatNumber active">{stats.enCurso}</span>
+                <span className="datosSesionStatLabel">En curso</span>
+              </div>
+              <div className="datosSesionStatDivider" />
+              <div className="datosSesionStatItem">
+                <span className="datosSesionStatNumber completed">{stats.finalizados}</span>
+                <span className="datosSesionStatLabel">Finalizados</span>
+              </div>
+              <div className="datosSesionStatDivider" />
+              <div className="datosSesionStatItem">
+                <span className="datosSesionStatNumber capacity">{capacidadTotal}</span>
+                <span className="datosSesionStatLabel">Capacidad</span>
+              </div>
+            </div>
+            <div className="datosSesionConnectionStatus">
+              <span className="datosSesionConnectionDot"></span>
+              <span className="datosSesionConnectionText">
+                {conectado ? 'En vivo' : 'Sin conexión'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {error && (
         <div className="datosSesionError">
-          <svg className="datosSesionErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+          <FiAlertCircle className="datosSesionErrorIcon" />
           <span>{error}</span>
           <button onClick={recargar} className="datosSesionRetryButton">
+            <FiRefreshCw className="datosSesionRetryIcon" />
             Reintentar
           </button>
         </div>
@@ -335,12 +439,9 @@ export default function DatosEvento() {
 
       {misEventos.length === 0 ? (
         <div className="datosSesionEmpty">
-          <svg className="datosSesionEmptyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
+          <div className="datosSesionEmptyIconContainer">
+            <MdEvent className="datosSesionEmptyIcon" />
+          </div>
           <h3 className="datosSesionEmptyTitle">Aún no has creado eventos</h3>
           <p className="datosSesionEmptyText">
             Comienza creando tu primer evento para ver los datos de asistencia
@@ -349,7 +450,8 @@ export default function DatosEvento() {
             onClick={() => navigate('/sesiones/nueva')}
             className="datosSesionEmptyButton"
           >
-            + Crear Evento
+            <FiPlus className="datosSesionEmptyButtonIcon" />
+            Crear Evento
           </button>
         </div>
       ) : (

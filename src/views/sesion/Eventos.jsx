@@ -4,11 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useSesiones } from '../../context/SesionesContext';
+import { 
+  FiLock, FiGlobe,
+  FiUser, FiUsers, FiSearch, FiEdit2, FiTrash2,
+  FiCheckCircle, FiAlertCircle, FiRefreshCw, FiBookOpen,
+  FiKey, FiLogIn, FiAward, FiPlus
+} from 'react-icons/fi';
+import { MdLocationOn, MdAccessTime, MdDateRange, MdPeople } from 'react-icons/md';
 import '../../styles/Eventos.css';
 
 const etiquetaTipo = (tipo) => (
-  <span className="eventosCardType">
-    {tipo === 'privado' ? '🔒 Privado' : '🌐 Público'}
+  <span className={`eventosCardType ${tipo === 'privado' ? 'eventosCardTypePrivado' : 'eventosCardTypePublico'}`}>
+    {tipo === 'privado' ? <FiLock className="eventosCardTypeIcon" /> : <FiGlobe className="eventosCardTypeIcon" />}
+    {tipo === 'privado' ? ' Privado' : ' Público'}
   </span>
 );
 
@@ -26,14 +34,14 @@ function TarjetaUnirse({ sesion, index, onJoinSuccess, yaUnido }) {
     setMsg({ texto: '', tipo: '' });
     try {
       const data = await api.sesiones.unirse(sesion.code, sesion.tipo === 'privado' ? password : undefined);
-      setMsg({ texto: data.message || '¡Te uniste al evento!', tipo: 'ok' });
+      setMsg({ texto: data.message || 'Te has unido al evento exitosamente', tipo: 'ok' });
       setUnido(true);
 
       if (onJoinSuccess) {
         onJoinSuccess(sesion.id);
       }
     } catch (err) {
-      setMsg({ texto: err.message, tipo: 'error' });
+      setMsg({ texto: err.message || 'Error al unirse al evento', tipo: 'error' });
     } finally {
       setLoading(false);
     }
@@ -43,63 +51,73 @@ function TarjetaUnirse({ sesion, index, onJoinSuccess, yaUnido }) {
     <div
       className={`eventosCard ${isHovered ? 'eventosCardHovered' : ''}`}
       style={{
-        animation: `slideUp 0.6s ease ${index * 0.1}s both`,
+        animation: `slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <div className="eventosCardAccent" />
+      
       <div className="eventosCardHeader">
-        <span className="eventosCardCode">Código: {sesion.code || '—'}</span>
+        <div className="eventosCardCode">
+          <FiBookOpen className="eventosCardCodeIcon" />
+          {sesion.code || '---'}
+        </div>
         {etiquetaTipo(sesion.tipo)}
       </div>
 
       <h3 className="eventosCardTitle">{sesion.titulo}</h3>
-      <p className="eventosCardDescription">{sesion.detalles || 'Sin descripción.'}</p>
+      <p className="eventosCardDescription">{sesion.detalles || 'Sin descripción disponible.'}</p>
 
       <div className="eventosCardDetails">
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">📍</span>
-          <span><strong>Sala:</strong> {sesion.sala || '—'}</span>
+          <MdLocationOn className="eventosDetailIcon" />
+          <span><strong>Sala:</strong> {sesion.sala || 'No asignada'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">📅</span>
-          <span><strong>Fecha:</strong> {sesion.fecha || '—'}</span>
+          <MdDateRange className="eventosDetailIcon" />
+          <span><strong>Fecha:</strong> {sesion.fecha || 'No especificada'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">⏰</span>
-          <span><strong>Horario:</strong> {sesion.hora_inicio} - {sesion.hora_fin}</span>
+          <MdAccessTime className="eventosDetailIcon" />
+          <span><strong>Horario:</strong> {sesion.hora_inicio} - {sesion.hora_fin || '...'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">👥</span>
-          <span><strong>Capacidad:</strong> {sesion.capacidad ? `${sesion.capacidad} personas` : '—'}</span>
+          <MdPeople className="eventosDetailIcon" />
+          <span><strong>Capacidad:</strong> {sesion.capacidad ? `${sesion.capacidad} personas` : 'Ilimitada'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">👤</span>
-          <span><strong>Organizador:</strong> {sesion.organizador || '—'}</span>
+          <FiUser className="eventosDetailIcon" />
+          <span><strong>Organizador:</strong> {sesion.organizador || 'No especificado'}</span>
         </div>
       </div>
 
       {msg.texto && (
         <div className={`eventosMessage eventosMessage${msg.tipo === 'ok' ? 'Ok' : 'Error'}`}>
-          {msg.tipo === 'ok' ? '✅' : '❌'} {msg.texto}
+          {msg.tipo === 'ok' ? <FiCheckCircle className="eventosMessageIcon" /> : <FiAlertCircle className="eventosMessageIcon" />}
+          <span>{msg.texto}</span>
         </div>
       )}
 
       {mostrarComoUnido ? (
         <div className="eventosMessage eventosMessageOk">
-          ✅ Ya estás registrado en este evento
+          <FiCheckCircle className="eventosMessageIcon" />
+          <span>Ya estás registrado en este evento</span>
         </div>
       ) : (
         sesion.tipo === 'privado' ? (
           <div className="eventosPrivateJoin">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña del evento"
-              className="eventosPasswordInput"
-              disabled={loading}
-            />
+            <div className="eventosPasswordWrapper">
+              <FiKey className="eventosPasswordIcon" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Contraseña del evento"
+                className="eventosPasswordInput"
+                disabled={loading}
+              />
+            </div>
             <button
               onClick={handleUnirse}
               disabled={loading || !password.trim()}
@@ -108,9 +126,13 @@ function TarjetaUnirse({ sesion, index, onJoinSuccess, yaUnido }) {
               {loading ? (
                 <span className="eventosLoadingSpinner">
                   <span className="eventosSmallSpinner"></span>
+                  <span>Uniendo...</span>
                 </span>
               ) : (
-                '🔑 Unirse'
+                <>
+                  <FiLogIn className="eventosJoinIcon" />
+                  Unirse
+                </>
               )}
             </button>
           </div>
@@ -123,10 +145,13 @@ function TarjetaUnirse({ sesion, index, onJoinSuccess, yaUnido }) {
             {loading ? (
               <span className="eventosLoadingSpinner">
                 <span className="eventosSmallSpinner"></span>
-                Procesando...
+                <span>Procesando...</span>
               </span>
             ) : (
-              '✅ Unirse al evento'
+              <>
+                <FiLogIn className="eventosJoinIcon" />
+                Unirse al evento
+              </>
             )}
           </button>
         )
@@ -140,41 +165,52 @@ function TarjetaAdmin({ sesion, onEditar, onEliminar, index }) {
 
   return (
     <div
-      className={`eventosCard ${isHovered ? 'eventosCardHovered' : ''}`}
+      className={`eventosCard eventosCardAdmin ${isHovered ? 'eventosCardHovered' : ''}`}
       style={{
-        animation: `slideUp 0.6s ease ${index * 0.1}s both`,
+        animation: `slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <div className="eventosCardAccent adminAccent" />
+      
       <div className="eventosCardHeader">
-        <span className="eventosCardCode">Código: {sesion.code || '—'}</span>
-        {etiquetaTipo(sesion.tipo)}
+        <div className="eventosCardCode">
+          <FiBookOpen className="eventosCardCodeIcon" />
+          {sesion.code || '---'}
+        </div>
+        <div className="eventosCardBadges">
+          {etiquetaTipo(sesion.tipo)}
+          <span className="eventosAdminBadge">
+            <FiAward className="eventosAdminBadgeIcon" />
+            Admin
+          </span>
+        </div>
       </div>
 
       <h3 className="eventosCardTitle">{sesion.titulo}</h3>
-      <p className="eventosCardDescription">{sesion.detalles || 'Sin descripción.'}</p>
+      <p className="eventosCardDescription">{sesion.detalles || 'Sin descripción disponible.'}</p>
 
       <div className="eventosCardDetails">
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">📍</span>
-          <span><strong>Sala:</strong> {sesion.sala || '—'}</span>
+          <MdLocationOn className="eventosDetailIcon" />
+          <span><strong>Sala:</strong> {sesion.sala || 'No asignada'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">📅</span>
-          <span><strong>Fecha:</strong> {sesion.fecha || '—'}</span>
+          <MdDateRange className="eventosDetailIcon" />
+          <span><strong>Fecha:</strong> {sesion.fecha || 'No especificada'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">⏰</span>
-          <span><strong>Horario:</strong> {sesion.hora_inicio} - {sesion.hora_fin}</span>
+          <MdAccessTime className="eventosDetailIcon" />
+          <span><strong>Horario:</strong> {sesion.hora_inicio} - {sesion.hora_fin || '...'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">👥</span>
-          <span><strong>Capacidad:</strong> {sesion.capacidad ? `${sesion.capacidad} personas` : '—'}</span>
+          <MdPeople className="eventosDetailIcon" />
+          <span><strong>Capacidad:</strong> {sesion.capacidad ? `${sesion.capacidad} personas` : 'Ilimitada'}</span>
         </div>
         <div className="eventosDetailItem">
-          <span className="eventosDetailIcon">👤</span>
-          <span><strong>Organizador:</strong> {sesion.organizador || '—'}</span>
+          <FiUser className="eventosDetailIcon" />
+          <span><strong>Organizador:</strong> {sesion.organizador || 'No especificado'}</span>
         </div>
       </div>
 
@@ -182,12 +218,14 @@ function TarjetaAdmin({ sesion, onEditar, onEliminar, index }) {
         <div className="eventosAdminActions">
           {onEditar && (
             <button onClick={onEditar} className="eventosEditButton">
-              ✏️ Editar
+              <FiEdit2 className="eventosActionIcon" />
+              Editar
             </button>
           )}
           {onEliminar && (
             <button onClick={onEliminar} className="eventosDeleteButton">
-              🗑️ Eliminar
+              <FiTrash2 className="eventosActionIcon" />
+              Eliminar
             </button>
           )}
         </div>
@@ -203,14 +241,12 @@ export default function Eventos() {
   const { sesiones, loading, error, conectado, setSesiones, recargar } = useSesiones();
 
   const [busqueda, setBusqueda] = useState('');
-  const [joiningId, setJoiningId] = useState(null);
+  const [filtroTipo, setFiltroTipo] = useState('todos'); // 'todos', 'privado', 'publico'
 
   const handleJoinSuccess = (id) => {
-    setJoiningId(id);
     recargar();
 
     setTimeout(() => {
-      setJoiningId(null);
       navigate('/home');
     }, 1200);
   };
@@ -221,24 +257,34 @@ export default function Eventos() {
       await api.sesiones.eliminar(id);
       setSesiones((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
-      alert(err.message);
+      alert(err.message || 'Error al eliminar el evento');
     }
   };
 
   const filtradas = useMemo(() => {
     if (!sesiones.length) return [];
 
-    if (!busqueda.trim()) return sesiones;
+    let resultado = sesiones;
 
-    const term = busqueda.toLowerCase().trim();
-    return sesiones.filter((s) =>
-      s.organizador?.toLowerCase().includes(term) ||
-      s.code?.toLowerCase().includes(term) ||
-      s.sala?.toLowerCase().includes(term) ||
-      s.titulo?.toLowerCase().includes(term) ||
-      s.detalles?.toLowerCase().includes(term)
-    );
-  }, [sesiones, busqueda]);
+    // Filtro de búsqueda
+    if (busqueda.trim()) {
+      const term = busqueda.toLowerCase().trim();
+      resultado = resultado.filter((s) =>
+        s.organizador?.toLowerCase().includes(term) ||
+        s.code?.toLowerCase().includes(term) ||
+        s.sala?.toLowerCase().includes(term) ||
+        s.titulo?.toLowerCase().includes(term) ||
+        s.detalles?.toLowerCase().includes(term)
+      );
+    }
+
+    // Filtro de tipo
+    if (filtroTipo !== 'todos') {
+      resultado = resultado.filter((s) => s.tipo === filtroTipo);
+    }
+
+    return resultado;
+  }, [sesiones, busqueda, filtroTipo]);
 
   const isUserJoined = (sesion) => {
     if (!user) return false;
@@ -246,34 +292,93 @@ export default function Eventos() {
            sesion.organizador === user.username;
   };
 
+  // Contar eventos por tipo
+  const totalEventos = sesiones.length;
+  const publicos = sesiones.filter(s => s.tipo === 'publico').length;
+  const privados = sesiones.filter(s => s.tipo === 'privado').length;
+
   return (
     <div className="eventosContainer">
       <div className="eventosHeader">
         <div className="eventosHeaderContent">
-          <div>
-            <h1 className="eventosTitle">Eventos</h1>
+          <div className="eventosHeaderLeft">
+            <h1 className="eventosTitle">
+              Eventos
+            </h1>
             <p className="eventosSubtitle">
-              {user?.role === 'admin' ? 'Administra los eventos del congreso' : 'Explora y únete a los eventos disponibles'}
+              {user?.role === 'admin' 
+                ? 'Administra los eventos del congreso' 
+                : 'Explora y únete a los eventos disponibles'}
             </p>
           </div>
-          <div className="eventosHeaderActions">
-            <div className="eventosSearchWrapper">
-              <svg className="eventosSearchIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar por código, sala, anfitrión..."
-                className="eventosSearchInput"
-              />
+          <div className="eventosHeaderRight">
+            <div className="eventosStats">
+              <div className="eventosStatItem">
+                <span className="eventosStatNumber">{totalEventos}</span>
+                <span className="eventosStatLabel">Total</span>
+              </div>
+              <div className="eventosStatDivider" />
+              <div className="eventosStatItem">
+                <span className="eventosStatNumber public">{publicos}</span>
+                <span className="eventosStatLabel">Públicos</span>
+              </div>
+              <div className="eventosStatDivider" />
+              <div className="eventosStatItem">
+                <span className="eventosStatNumber private">{privados}</span>
+                <span className="eventosStatLabel">Privados</span>
+              </div>
             </div>
-            <span className={`eventosConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
-              {conectado ? '🟢 En vivo' : '🔴 Desconectado'}
-            </span>
+            <div className={`eventosConnectionStatus ${conectado ? 'connected' : 'disconnected'}`}>
+              <span className="eventosConnectionDot"></span>
+              <span className="eventosConnectionText">
+                {conectado ? 'En vivo' : 'Sin conexión'}
+              </span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Barra de búsqueda y filtros */}
+      <div className="eventosFilters">
+        <div className="eventosSearchWrapper">
+          <FiSearch className="eventosSearchIcon" />
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar por código, sala, organizador..."
+            className="eventosSearchInput"
+          />
+          {busqueda && (
+            <button 
+              className="eventosSearchClear"
+              onClick={() => setBusqueda('')}
+            >
+              ×
+            </button>
+          )}
+        </div>
+        <div className="eventosFilterButtons">
+          <button
+            className={`eventosFilterButton ${filtroTipo === 'todos' ? 'active' : ''}`}
+            onClick={() => setFiltroTipo('todos')}
+          >
+            Todos
+          </button>
+          <button
+            className={`eventosFilterButton ${filtroTipo === 'publico' ? 'active' : ''}`}
+            onClick={() => setFiltroTipo('publico')}
+          >
+            <FiGlobe className="eventosFilterIcon" />
+            Públicos
+          </button>
+          <button
+            className={`eventosFilterButton ${filtroTipo === 'privado' ? 'active' : ''}`}
+            onClick={() => setFiltroTipo('privado')}
+          >
+            <FiLock className="eventosFilterIcon" />
+            Privados
+          </button>
         </div>
       </div>
 
@@ -286,13 +391,10 @@ export default function Eventos() {
 
       {error && (
         <div className="eventosError">
-          <svg className="eventosErrorIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+          <FiAlertCircle className="eventosErrorIcon" />
           <span>{error}</span>
           <button onClick={recargar} className="eventosRetryButton">
+            <FiRefreshCw className="eventosRetryIcon" />
             Reintentar
           </button>
         </div>
@@ -301,22 +403,28 @@ export default function Eventos() {
       {!loading && !error && (
         filtradas.length === 0 ? (
           <div className="eventosEmpty">
-            <svg className="eventosEmptyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
+            <div className="eventosEmptyIconContainer">
+              <FiBookOpen className="eventosEmptyIcon" />
+            </div>
             <h3 className="eventosEmptyTitle">
               {busqueda ? `No hay resultados para "${busqueda}"` : 'No hay eventos disponibles'}
             </h3>
             <p className="eventosEmptyText">
               {busqueda
-                ? 'Intenta con otros términos de búsqueda'
+                ? 'Intenta con otros términos de búsqueda o elimina los filtros'
                 : user?.role === 'admin'
                 ? 'Crea tu primer evento para comenzar'
                 : 'Vuelve más tarde para ver nuevos eventos'}
             </p>
+            {user?.role === 'admin' && !busqueda && (
+              <button 
+                className="eventosCreateButton"
+                onClick={() => navigate('/sesiones/crear')}
+              >
+                <FiPlus className="eventosCreateIcon" />
+                Crear Evento
+              </button>
+            )}
           </div>
         ) : (
           <div className="eventosGrid">
