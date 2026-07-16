@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { api } from '../../services/api';
 import { 
   FiCamera, FiArrowLeft, FiPause, FiPlay, FiCheckCircle, 
@@ -24,6 +24,7 @@ export default function EscanearQR() {
   const ultimoTokenRef = useRef(null);
   const ultimoTiempoRef = useRef(0);
   const audioContextRef = useRef(null);
+  const [errorCamara, setErrorCamara] = useState(null);
 
   // Cargar evento
   useEffect(() => {
@@ -56,7 +57,6 @@ export default function EscanearQR() {
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.15);
         
-        // Segundo tono más agudo
         setTimeout(() => {
           const osc2 = ctx.createOscillator();
           const gain2 = ctx.createGain();
@@ -93,7 +93,6 @@ export default function EscanearQR() {
   const procesarCodigo = useCallback(async (qrToken) => {
     const ahora = Date.now();
     
-    // Evitar escaneos duplicados en corto tiempo
     if (qrToken === ultimoTokenRef.current && ahora - ultimoTiempoRef.current < 3000) {
       return;
     }
@@ -118,7 +117,6 @@ export default function EscanearQR() {
 
       setHistorial((prev) => [entry, ...prev]);
       
-      // Feedback visual y sonoro
       if (data.ya_registrado) {
         reproducirSonido('repetido');
         mostrarNotificacionTemporal('⚠️ Pase ya registrado', 'warning');
@@ -155,29 +153,41 @@ export default function EscanearQR() {
   useEffect(() => {
     if (!escaneando || loading) return;
 
-    const scanner = new Html5QrcodeScanner(
-      'lector-qr',
-      { 
-        fps: 10, 
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0,
-        formatsToSupport: [ 'QR_CODE' ]
-      },
-      false
-    );
+    if (!window.isSecureContext || !navigator.mediaDevices) {
+      setErrorCamara(
+        'Este dispositivo no tiene acceso seguro a la cámara. Abre la app desde la dirección https:// real (no una IP local por http://) para poder escanear.'
+      );
+      return;
+    }
 
-    scanner.render(
-      (decodedText) => procesarCodigo(decodedText),
-      (error) => {
-        // Silenciar errores de renderizado
-      }
-    );
+    let scanner;
+    try {
+      scanner = new Html5QrcodeScanner(
+        'lector-qr',
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
+          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        },
+        false
+      );
 
-    scannerRef.current = scanner;
+      scanner.render(
+        (decodedText) => procesarCodigo(decodedText),
+        () => {}
+      );
+
+      scannerRef.current = scanner;
+      setErrorCamara(null);
+    } catch (err) {
+      setErrorCamara('No se pudo iniciar la cámara: ' + (err?.message || 'error desconocido'));
+    }
 
     return () => {
       if (scannerRef.current) {
         scannerRef.current.clear().catch(() => {});
+        scannerRef.current = null;
       }
     };
   }, [escaneando, procesarCodigo, loading]);
@@ -226,7 +236,6 @@ export default function EscanearQR() {
 
   return (
     <div className="escanearContainer">
-      {/* Notificación flotante */}
       {mostrarNotificacion && (
         <div className={`escanearNotificacion escanearNotificacion--${mostrarNotificacion.tipo}`}>
           <span className="escanearNotificacionIcon">
@@ -238,7 +247,6 @@ export default function EscanearQR() {
         </div>
       )}
 
-      {/* Header */}
       <div className="escanearHeader">
         <div className="escanearHeaderLeft">
           <h1 className="escanearTitle">
@@ -267,7 +275,6 @@ export default function EscanearQR() {
         </div>
       </div>
 
-      {/* Estado del evento */}
       {!eventoActivo && (
         <div className="escanearAdvertencia">
           <FiAlertTriangle className="escanearAdvertenciaIcon" />
@@ -283,9 +290,13 @@ export default function EscanearQR() {
         {eventoActivo && ' El evento está activo y listo para escanear.'}
       </p>
 
-      {/* Lector QR */}
       <div className="escanearLectorWrapper">
-        {escaneando ? (
+        {errorCamara ? (
+          <div className="escanearPausado">
+            <FiAlertTriangle className="escanearPausadoIcon" />
+            <p>{errorCamara}</p>
+          </div>
+        ) : escaneando ? (
           <div id="lector-qr" className="escanearLector" />
         ) : (
           <div className="escanearPausado">
@@ -300,7 +311,6 @@ export default function EscanearQR() {
           </div>
         )}
         
-        {/* Controles del escáner */}
         <div className="escanearControles">
           <button
             onClick={() => setEscaneando((prev) => !prev)}
@@ -330,7 +340,6 @@ export default function EscanearQR() {
         </div>
       </div>
 
-      {/* Estadísticas */}
       {historial.length > 0 && (
         <div className="escanearEstadisticas">
           <div className="escanearEstadistica">
@@ -355,7 +364,6 @@ export default function EscanearQR() {
         </div>
       )}
 
-      {/* Historial */}
       <div className="escanearHistorial">
         <div className="escanearHistorialHeader">
           <h3 className="escanearHistorialTitle">
